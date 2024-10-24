@@ -2,6 +2,12 @@ export interface ItfData {
 	href: string;
 	value: string;
 	timestamp: number;
+	following?: boolean;
+	followingTimestamp?: number;
+	followingDate?: Date | false;
+	followers?: boolean;
+	followersTimestamp?: number;
+	followersDate?: Date | false;
 }
 export interface ItfExport {
 	title: string;

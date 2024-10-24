@@ -29,27 +29,32 @@ const Match = ({
 	}) => void;
 }) => {
 	const { i18n } = useTranslation();
-	const [accounts, setAccounts] = useState({});
+	const [accounts, setAccounts] = useState([]);
 
 	const flatten = ({ data, root, info }) => {
 		return (root && Array.isArray(data[root]) ? data[root] : data)
 			.map((r: ItfExport) => r[info])
-			.flat(1)
-			.reverse();
+			.flat(1);
 	};
 	const merge = ({ merged, data, type }) => {
 		data.forEach((d: ItfData) => {
-			if (!merged[d.value])
-				merged[d.value] = {
-					following: false,
-					followers: false,
-				};
+			let idx = merged.findIndex((m: ItfData) => m.value === d.value);
 
-			merged[d.value] = {
-				...merged[d.value],
-				...d,
-				[type]: true,
-			};
+			if (idx === -1) {
+				merged.push({
+					...d,
+					following: false,
+					followingTimestamp: 0,
+					followingDate: false,
+					followers: false,
+					followersTimestamp: 0,
+					followersDate: false,
+				});
+				idx = merged.findIndex((m: ItfData) => m.value === d.value);
+			}
+			merged[idx][type] = true;
+			merged[idx][`${type}Timestamp`] = d.timestamp;
+			merged[idx][`${type}Date`] = new Date(d.timestamp * 1000);
 		});
 		return merged;
 	};
@@ -65,30 +70,30 @@ const Match = ({
 			root: Config.data.followers.root,
 			info: Config.data.followers.info,
 		});
-		let merged = {};
+		let merged = [];
 
 		merged = merge({ merged, data: followingFlatten, type: 'following' });
 		merged = merge({ merged, data: followersFlatten, type: 'followers' });
 
-		Object.keys(merged).forEach((k) => {
-			merged[k].date = new Date(merged[k].timestamp * 1000);
-		});
+		merged.sort(
+			(a: ItfData, b: ItfData) =>
+				a.followingTimestamp - b.followingTimestamp
+		);
+
 		setAccounts(merged);
 		setTotals({
 			followers: followersFlatten.length,
 			following: followingFlatten.length,
-			_: Object.keys(merged).length,
+			_: merged.length,
 		});
 	}, [setTotals]);
-
-	//page
 
 	return (
 		<section>
 			<Helmet>
 				<title>{i18n.t('MATCH')}</title>
 			</Helmet>
-			{Object.keys(accounts).length > 0 ? (
+			{accounts.length > 0 ? (
 				<table className='table table-sm table-hover'>
 					<thead>
 						<tr>
@@ -98,80 +103,83 @@ const Match = ({
 								style={{ width: '1px' }}>
 								#
 							</th>
-							<th
-								scope='col'
-								className='pe-2'
-								style={{ width: '1px' }}>
-								{i18n.t('DATE')}
-							</th>
 							<th scope='col'>{i18n.t('ID')}</th>
 							<th
 								scope='col'
-								className='text-center'
 								style={{ width: '1px' }}>
 								{i18n.t('FOLLOWERS')}
 							</th>
 							<th
 								scope='col'
-								className='text-center'
 								style={{ width: '1px' }}>
 								{i18n.t('FOLLOWING')}
 							</th>
 						</tr>
 					</thead>
 					<tbody>
-						{Object.keys(accounts)
+						{accounts
 							.slice(
 								Config.itemsPerPage * page,
 								Config.itemsPerPage * page + Config.itemsPerPage
 							)
-							.map((k, j) => {
+							.map((account, k) => {
 								return (
 									<tr
 										key={k}
 										className={
-											!accounts[k].followers
+											!account.followers
 												? 'table-warning'
 												: ''
 										}>
 										<th
 											scope='row'
 											className='text-end pe-2 small'>
-											{j + 1 + Config.itemsPerPage * page}
+											{k + 1 + Config.itemsPerPage * page}
 										</th>
-										<td className='pe-2 text-nowrap small'>
-											{
-												accounts[k].date
-													.toISOString()
-													.split('T')[0]
-											}
-										</td>
 										<td>
 											<a
-												href={accounts[k].href}
+												href={account.href}
 												target='_blank'
 												rel='noreferrer'
 												className={`fw-bold${
-													!accounts[k].followers
+													!account.followers
 														? ' text-danger'
 														: ''
 												}`}>
-												{accounts[k].value}
+												{account.value}
 											</a>
 										</td>
-										<td className='text-center'>
-											{accounts[k].followers ? (
+										<td className='text-nowrap'>
+											{account.followers ? (
 												<CheckCircle />
 											) : (
 												<Ban className='text-danger' />
 											)}
+											{account.followersDate ? (
+												<span className='small ms-1'>
+													{
+														account.followersDate
+															.toISOString()
+															.split('T')[0]
+													}
+												</span>
+											) : null}
 										</td>
-										<td className='text-center'>
-											{accounts[k].following ? (
+										<td className='text-nowrap'>
+											{account.following ? (
 												<CheckCircle />
 											) : (
 												<Ban className='text-danger' />
 											)}
+											{account.followingDate ? (
+												<span className='small ms-1'>
+													{
+														account.followingDate
+															.toISOString()
+															.split('T')[0]
+													}
+												</span>
+											) : null}
 										</td>
 									</tr>
 								);
