@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 const Header = ({
 	totals,
 	setFilter = () => {},
+	children,
 }: {
 	totals: {
 		followers: number;
@@ -10,6 +11,7 @@ const Header = ({
 		_: number;
 	};
 	setFilter: (f?: string) => void;
+	children: React.ReactNode;
 }) => {
 	const { i18n } = useTranslation();
 
@@ -43,6 +45,10 @@ const Header = ({
 						</div>
 					</div>
 				</div>
+			</div>
+			<hr />
+			<div className='row'>
+				<div className='col-12'>{children}</div>
 			</div>
 			<hr />
 		</header>

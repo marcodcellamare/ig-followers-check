@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import Match from './Match';
 import Header from './Header';
+import Pagination from './Pagination';
 
 const Layout = () => {
 	const [totals, setTotals] = useState({
@@ -29,6 +30,9 @@ const Layout = () => {
 		},
 		[]
 	);
+	const gatedSetPage = useCallback((p?: number) => {
+		setPage(p);
+	}, []);
 	const gatedSetFilter = useCallback((f?: string) => {
 		setFilter(f);
 	}, []);
@@ -38,8 +42,13 @@ const Layout = () => {
 			<main className='container'>
 				<Header
 					totals={totals}
-					setFilter={gatedSetFilter}
-				/>
+					setFilter={gatedSetFilter}>
+					<Pagination
+						page={page}
+						total={totals._}
+						setPage={gatedSetPage}
+					/>
+				</Header>
 				<Match
 					page={page}
 					filter={filter}

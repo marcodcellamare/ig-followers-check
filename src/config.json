@@ -60,5 +60,6 @@
 			"info": "string_list_data"
 		}
 	},
-	"itemsPerPage": 30
+	"itemsPerPage": 50,
+	"pagination": 10
 }
