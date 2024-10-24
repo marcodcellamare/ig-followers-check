@@ -1,0 +1,53 @@
+{
+	"domain": "https://marcodcellamare.github.io",
+	"locale": {
+		"default": "en-GB",
+		"defaultNS": "default",
+		"allowed": [
+			"en-GB"
+		],
+		"ns": {
+			"_": [],
+			"%ISO%": [
+				"default"
+			]
+		},
+		"country": false
+	},
+	"html": {
+		"tags": [
+			"b",
+			"strong",
+			"i",
+			"u",
+			"br",
+			"ul",
+			"ol",
+			"li",
+			"a"
+		],
+		"moreTags": [
+			"p",
+			"h2",
+			"h3",
+			"h4",
+			"h5",
+			"h6",
+			"b",
+			"strong",
+			"i",
+			"u",
+			"br",
+			"ul",
+			"ol",
+			"li",
+			"a"
+		],
+		"attr": [
+			"class",
+			"href",
+			"target",
+			"rel"
+		]
+	}
+}

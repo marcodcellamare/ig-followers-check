@@ -1,0 +1,60 @@
+{
+	"name": "ig-followers-check",
+	"version": "0.1.0",
+	"author": {
+		"name": "Marco D. Cellamare",
+		"email": "md.cellamare@gmail.com",
+		"url": "https://github.com/marcodcellamare/"
+	},
+	"license": "UNLICENSED",
+	"created": "2024-10-24",
+	"private": true,
+	"homepage": "./",
+	"dependencies": {
+		"@testing-library/jest-dom": "^5.17.0",
+		"@testing-library/react": "^13.4.0",
+		"@testing-library/user-event": "^13.5.0",
+		"@types/react": "^18.3.12",
+		"@types/react-dom": "^18.3.1",
+		"bootstrap": "^5.3.3",
+		"i18next": "^23.16.2",
+		"react": "^18.3.1",
+		"react-app-polyfill": "^3.0.0",
+		"react-bootstrap-icons": "^1.11.4",
+		"react-dom": "^18.3.1",
+		"react-helmet-async": "^2.0.5",
+		"react-i18next": "^15.1.0",
+		"react-scripts": "5.0.1",
+		"web-vitals": "^2.1.4"
+	},
+	"scripts": {
+		"start": "PORT=8811 env-cmd -f .env.dev craco start",
+		"build": "env-cmd -f .env.prod craco build"
+	},
+	"eslintConfig": {
+		"extends": [
+			"react-app",
+			"react-app/jest"
+		]
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	},
+	"devDependencies": {
+		"@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+		"@craco/craco": "^7.1.0",
+		"craco-alias": "^3.0.1",
+		"glob-all": "^3.3.1",
+		"purgecss-webpack-plugin": "^6.0.0",
+		"sass": "^1.77.8"
+	}
+}
