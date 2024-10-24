@@ -49,5 +49,16 @@
 			"target",
 			"rel"
 		]
-	}
+	},
+	"data": {
+		"followers": {
+			"root": "",
+			"info": "string_list_data"
+		},
+		"following": {
+			"root": "relationships_following",
+			"info": "string_list_data"
+		}
+	},
+	"itemsPerPage": 30
 }

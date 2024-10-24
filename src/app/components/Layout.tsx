@@ -1,20 +1,52 @@
-import { Helmet } from 'react-helmet-async';
-import { useTranslation } from 'react-i18next';
+import { useCallback, useState } from 'react';
+import Match from './Match';
+import Header from './Header';
 
 const Layout = () => {
-	const { i18n } = useTranslation();
+	const [totals, setTotals] = useState({
+		followers: 0,
+		following: 0,
+		_: 0,
+	});
+	const [page, setPage] = useState(0);
+	const [filter, setFilter] = useState('');
+
+	const gatedSetTotals = useCallback(
+		({
+			followers,
+			following,
+			_,
+		}: {
+			followers: number;
+			following: number;
+			_: number;
+		}) => {
+			setTotals({
+				followers,
+				following,
+				_,
+			});
+		},
+		[]
+	);
+	const gatedSetFilter = useCallback((f?: string) => {
+		setFilter(f);
+	}, []);
 
 	return (
-		<>
-			<Helmet>
-				<title>culo</title>
-			</Helmet>
-			<div className='app'>
-				<main className='container'>
-					<div>LAYOUT</div>
-				</main>
-			</div>
-		</>
+		<div className='app py-3'>
+			<main className='container'>
+				<Header
+					totals={totals}
+					setFilter={gatedSetFilter}
+				/>
+				<Match
+					page={page}
+					filter={filter}
+					setTotals={gatedSetTotals}
+				/>
+			</main>
+		</div>
 	);
 };
 export default Layout;

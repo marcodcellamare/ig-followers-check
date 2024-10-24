@@ -1,3 +1,12 @@
 {
-	"TITLE": "IG Followers Check"
+	"TITLE": "IG Followers Check",
+	"MATCH": "Match",
+	"ID": "ID",
+	"FOLLOWING": "Following",
+	"FOLLOWERS": "Followers",
+	"NOT_FOLLOWERS": "Not followers",
+	"FOLLOWING_BACK": "Following back",
+	"ALL": "All",
+	"LINK": "Link",
+	"DATE": "Date"
 }
