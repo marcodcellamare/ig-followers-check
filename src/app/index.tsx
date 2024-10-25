@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
+import { InfoProvider } from '@providers/info';
 import Layout from '@components/Layout';
 import '@styles/main.scss';
 
@@ -13,7 +14,9 @@ const App = () => {
 				defaultTitle={i18n.t('TITLE')}
 				htmlAttributes={{ lang: i18n.language }}
 			/>
-			<Layout />
+			<InfoProvider>
+				<Layout />
+			</InfoProvider>
 		</>
 	);
 };

@@ -14,3 +14,6 @@ export interface ItfExport {
 	media_list_data: any;
 	string_list_data: ItfData[];
 }
+export interface ItfExportFollowing {
+	relationships_following: ItfExport[];
+}

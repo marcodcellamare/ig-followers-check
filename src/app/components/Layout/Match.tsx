@@ -2,14 +2,15 @@ import { useEffect, useState } from 'react';
 import { Ban, CheckCircle } from 'react-bootstrap-icons';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
+import { useInfo } from '@providers/info';
 import Config from '@config';
 import { ItfData, ItfExport } from '@interfaces/scheme';
 
 // Users that you follow
-import following from '@assets/data/following.json';
+//import following from '@assets/data/following.json';
 
 // Users that follows your profile
-import followers from '@assets/data/followers_1.json';
+//import followers from '@assets/data/followers_1.json';
 
 const Match = ({
 	page = 0,
@@ -29,64 +30,7 @@ const Match = ({
 	}) => void;
 }) => {
 	const { i18n } = useTranslation();
-	const [accounts, setAccounts] = useState([]);
-
-	const flatten = ({ data, root, info }) => {
-		return (root && Array.isArray(data[root]) ? data[root] : data)
-			.map((r: ItfExport) => r[info])
-			.flat(1);
-	};
-	const merge = ({ merged, data, type }) => {
-		data.forEach((d: ItfData) => {
-			let idx = merged.findIndex((m: ItfData) => m.value === d.value);
-
-			if (idx === -1) {
-				merged.push({
-					...d,
-					following: false,
-					followingTimestamp: 0,
-					followingDate: false,
-					followers: false,
-					followersTimestamp: 0,
-					followersDate: false,
-				});
-				idx = merged.findIndex((m: ItfData) => m.value === d.value);
-			}
-			merged[idx][type] = true;
-			merged[idx][`${type}Timestamp`] = d.timestamp;
-			merged[idx][`${type}Date`] = new Date(d.timestamp * 1000);
-		});
-		return merged;
-	};
-
-	useEffect(() => {
-		const followingFlatten = flatten({
-			data: following,
-			root: Config.data.following.root,
-			info: Config.data.following.info,
-		});
-		const followersFlatten = flatten({
-			data: followers,
-			root: Config.data.followers.root,
-			info: Config.data.followers.info,
-		});
-		let merged = [];
-
-		merged = merge({ merged, data: followingFlatten, type: 'following' });
-		merged = merge({ merged, data: followersFlatten, type: 'followers' });
-
-		merged.sort(
-			(a: ItfData, b: ItfData) =>
-				a.followingTimestamp - b.followingTimestamp
-		);
-
-		setAccounts(merged);
-		setTotals({
-			followers: followersFlatten.length,
-			following: followingFlatten.length,
-			_: merged.length,
-		});
-	}, [setTotals]);
+	const { accounts } = useInfo();
 
 	return (
 		<section>

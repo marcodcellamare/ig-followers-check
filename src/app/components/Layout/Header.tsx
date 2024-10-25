@@ -1,3 +1,6 @@
+import File from '@components/Misc/File';
+import { ItfExport, ItfExportFollowing } from '@interfaces/scheme';
+import { useInfo } from '@providers/info';
 import { useTranslation } from 'react-i18next';
 
 const Header = ({
@@ -14,6 +17,7 @@ const Header = ({
 	children: React.ReactNode;
 }) => {
 	const { i18n } = useTranslation();
+	const { setFollowing, setFollowers } = useInfo();
 
 	return (
 		<header>
@@ -44,6 +48,27 @@ const Header = ({
 							{totals._}
 						</div>
 					</div>
+				</div>
+			</div>
+			<hr />
+			<div className='row gy-3'>
+				<div className='col-12 col-md-6'>
+					<File
+						type='followers'
+						label={i18n.t('FOLLOWERS')}
+						onFileSelected={(content: ItfExport[]) => {
+							setFollowers(content);
+						}}
+					/>
+				</div>
+				<div className='col-12 col-md-6'>
+					<File
+						type='following'
+						label={i18n.t('FOLLOWING')}
+						onFileSelected={(content: ItfExportFollowing) => {
+							setFollowing(content);
+						}}
+					/>
 				</div>
 			</div>
 			<hr />

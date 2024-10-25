@@ -8,5 +8,7 @@
 	"FOLLOWING_BACK": "Following back",
 	"ALL": "All",
 	"LINK": "Link",
-	"DATE": "Date"
+	"DATE": "Date",
+	"NOT_FOLLOWERS_ERROR": "It's the wrong file, you have to upload the Followers file here.",
+	"NOT_FOLLOWING_ERROR": "It's the wrong file, you have to upload the Following file here."
 }
