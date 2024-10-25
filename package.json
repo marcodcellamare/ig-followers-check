@@ -1,6 +1,6 @@
 {
 	"name": "ig-followers-check",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"author": {
 		"name": "Marco D. Cellamare",
 		"email": "md.cellamare@gmail.com",
@@ -16,7 +16,6 @@
 		"@testing-library/user-event": "^13.5.0",
 		"@types/react": "^18.3.12",
 		"@types/react-dom": "^18.3.1",
-		"axios": "^1.7.7",
 		"bootstrap": "^5.3.3",
 		"i18next": "^23.16.2",
 		"react": "^18.3.1",
