@@ -20,8 +20,8 @@ const InfoProvider = ({
 }) => {
 	const [followers, setFollowers] = useState<ItfExport[]>([]);
 	const [following, setFollowing] = useState<ItfExportFollowing>({});
-	const [accounts, setAccounts] = useState([]);
-	const [accountsFiltered, setAccountsFiltered] = useState([]);
+	const [accounts, setAccounts] = useState<ItfData[]>([]);
+	const [accountsFiltered, setAccountsFiltered] = useState<ItfData[]>([]);
 	const [totals, setTotals] = useState({
 		followers: 0,
 		following: 0,
