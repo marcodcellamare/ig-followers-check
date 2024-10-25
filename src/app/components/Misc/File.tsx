@@ -1,9 +1,8 @@
-import { ItfExport, ItfExportFollowing } from '@interfaces/scheme';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Config from '@config';
-import { v4 as uuidv4 } from 'uuid';
 import { useInfo } from '@providers/info';
+import { v4 as uuidv4 } from 'uuid';
+import { ItfExport, ItfExportFollowing } from '@interfaces/scheme';
 
 const File = ({
 	type = '',
@@ -19,7 +18,6 @@ const File = ({
 	const { i18n } = useTranslation();
 	const { isFollowing, isFollowers } = useInfo();
 	const [id, setId] = useState('');
-	//const [json, setJson] = useState<ItfExport[] | ItfExportFollowing>([]);
 
 	const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target && e.target.files && e.target.files[0]) {
@@ -59,7 +57,6 @@ const File = ({
 
 							default:
 						}
-						//setJson(content);
 						onFileSelected(content);
 					}
 				} catch (err) {
@@ -83,7 +80,7 @@ const File = ({
 			<label
 				htmlFor={id}
 				className='form-label'>
-				{i18n.t('FOLLOWERS')}
+				{label}
 			</label>
 			<input
 				id={id}

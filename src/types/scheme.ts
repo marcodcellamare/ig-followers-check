@@ -15,5 +15,6 @@ export interface ItfExport {
 	string_list_data: ItfData[];
 }
 export interface ItfExportFollowing {
-	relationships_following: ItfExport[];
+	relationships_following?: ItfExport[];
 }
+export type ItfFilterTypes = 'followers' | 'following' | 'not_followers' | '';

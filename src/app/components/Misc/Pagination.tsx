@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+import { useInfo } from '@providers/info';
 import Config from '@config';
 import {
 	ChevronDoubleLeft,
@@ -5,25 +7,17 @@ import {
 	ChevronLeft,
 	ChevronRight,
 } from 'react-bootstrap-icons';
-import { useEffect, useState } from 'react';
 
-const Pagination = ({
-	page,
-	total,
-	setPage = () => {},
-}: {
-	page: number;
-	total: number;
-	setPage: (p?: number) => void;
-}) => {
+const Pagination = () => {
+	const { totals, page, setPage } = useInfo();
 	const [pages, setPages] = useState(0);
 	const [start, setStart] = useState(0);
 	const [end, setEnd] = useState(0);
 	const [pagesArray, setPagesArray] = useState([]);
 
 	useEffect(() => {
-		setPages(Math.ceil(total / Config.itemsPerPage));
-	}, [total]);
+		setPages(Math.ceil(totals.filtered / Config.itemsPerPage));
+	}, [totals.filtered]);
 
 	useEffect(() => {
 		setStart(
@@ -50,9 +44,9 @@ const Pagination = ({
 			}
 		}
 		setPagesArray(_pagesArray);
-	}, [start, end, pages, page, total]);
+	}, [start, end, pages, page, totals.filtered]);
 
-	return (
+	return pagesArray.length > 1 ? (
 		<nav>
 			<ul className='pagination pagination-sm font-monospace my-0'>
 				<li className={`page-item${page === 0 ? ' disabled' : ''}`}>
@@ -107,6 +101,6 @@ const Pagination = ({
 				</li>
 			</ul>
 		</nav>
-	);
+	) : null;
 };
 export default Pagination;

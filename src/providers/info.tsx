@@ -6,28 +6,54 @@ import {
 	useState,
 } from 'react';
 import Config from '@config';
-import { ItfData, ItfExport, ItfExportFollowing } from '@interfaces/scheme';
+import {
+	ItfData,
+	ItfExport,
+	ItfExportFollowing,
+	ItfFilterTypes,
+} from '@interfaces/scheme';
 
 const InfoProvider = ({
 	children,
 }: {
 	children: React.ReactNode | React.ReactNode[];
 }) => {
-	const [followers, setFollowers] = useState<ItfExport[]>();
-	const [following, setFollowing] = useState<ItfExportFollowing>();
+	const [followers, setFollowers] = useState<ItfExport[]>([]);
+	const [following, setFollowing] = useState<ItfExportFollowing>({});
 	const [accounts, setAccounts] = useState([]);
+	const [accountsFiltered, setAccountsFiltered] = useState([]);
 	const [totals, setTotals] = useState({
 		followers: 0,
 		following: 0,
+		filtered: 0,
 		_: 0,
 	});
+	const [page, setPage] = useState(0);
+	const [filter, setFilter] = useState<ItfFilterTypes>('');
+	const [search, setSearch] = useState('');
+
+	const gatedSetPage = useCallback((p: number) => {
+		setPage(p);
+	}, []);
+
+	const gatedSetFilter = useCallback((f: ItfFilterTypes) => {
+		setFilter(f);
+		setPage(0);
+	}, []);
+
+	const gatedSetSearch = useCallback((q: string) => {
+		setSearch(q);
+		setPage(0);
+	}, []);
 
 	const gatedSetFollowers = useCallback((content: ItfExport[]) => {
 		setFollowers(content);
+		sessionStorage.setItem('followers', JSON.stringify(content));
 	}, []);
 
 	const gatedSetFollowing = useCallback((content: ItfExportFollowing) => {
 		setFollowing(content);
+		sessionStorage.setItem('following', JSON.stringify(content));
 	}, []);
 
 	const isFollowing = useCallback(
@@ -91,24 +117,26 @@ const InfoProvider = ({
 	};
 
 	useEffect(() => {
+		let followingFlatten = [];
+		let followersFlatten = [];
+		let merged = [];
+
 		if (
 			following &&
 			isFollowing(following) &&
 			followers &&
 			isFollowers(followers)
 		) {
-			const followingFlatten = flatten({
+			followingFlatten = flatten({
 				data: following,
 				root: Config.data.following.root,
 				info: Config.data.following.info,
 			});
-			const followersFlatten = flatten({
+			followersFlatten = flatten({
 				data: followers,
 				root: Config.data.followers.root,
 				info: Config.data.followers.info,
 			});
-			let merged = [];
-
 			merged = merge({
 				merged,
 				data: followingFlatten,
@@ -119,20 +147,82 @@ const InfoProvider = ({
 				data: followersFlatten,
 				type: 'followers',
 			});
-
 			merged.sort(
 				(a: ItfData, b: ItfData) =>
-					a.followingTimestamp - b.followingTimestamp
+					a.followingTimestamp - b.followingTimestamp ||
+					a.value.localeCompare(b.value)
 			);
+		}
+		setAccounts(merged);
+	}, [followers, following, isFollowers, isFollowing]);
 
-			setAccounts(merged);
-			setTotals({
-				followers: followersFlatten.length,
-				following: followingFlatten.length,
-				_: merged.length,
+	useEffect(() => {
+		const totalFollowers = accounts.filter(
+			(account) => account.followers === true
+		).length;
+		const totalFollowing = accounts.filter(
+			(account) => account.following === true
+		).length;
+		const total = accounts.length;
+		let _accountsFiltered = accounts;
+
+		// Filters
+
+		if (filter) {
+			_accountsFiltered = _accountsFiltered.filter((account) => {
+				switch (filter) {
+					case 'followers':
+						return account.followers === true;
+
+					case 'following':
+						return account.following === true;
+
+					case 'not_followers':
+						return account.followers === false;
+
+					default:
+						return true;
+				}
 			});
 		}
-	}, [followers, following, isFollowers, isFollowing]);
+
+		// Search
+
+		if (search) {
+			_accountsFiltered = _accountsFiltered.filter((account) => {
+				return (
+					account.value.includes(search) ||
+					account.href.includes(search)
+				);
+			});
+		}
+
+		// Totals
+
+		setTotals({
+			followers: totalFollowers,
+			following: totalFollowing,
+			filtered: _accountsFiltered.length,
+			_: total,
+		});
+
+		// Pagination
+
+		_accountsFiltered = _accountsFiltered.slice(
+			Config.itemsPerPage * page,
+			Config.itemsPerPage * page + Config.itemsPerPage
+		);
+
+		setAccountsFiltered(_accountsFiltered);
+	}, [accounts, page, filter, search]);
+
+	useEffect(() => {
+		const _followers = sessionStorage.getItem('followers');
+		const _following = sessionStorage.getItem('following');
+
+		if (_followers) setFollowers(JSON.parse(_followers));
+		if (_following) setFollowing(JSON.parse(_following));
+	}, []);
 
 	return (
 		<InfoContext.Provider
@@ -140,11 +230,18 @@ const InfoProvider = ({
 				following,
 				followers,
 				accounts,
+				accountsFiltered,
 				totals,
+				page,
+				filter,
+				search,
 				setFollowing: gatedSetFollowing,
 				setFollowers: gatedSetFollowers,
 				isFollowing,
 				isFollowers,
+				setPage: gatedSetPage,
+				setFilter: gatedSetFilter,
+				setSearch: gatedSetSearch,
 			}}>
 			{children}
 		</InfoContext.Provider>
@@ -154,11 +251,23 @@ const InfoContext = createContext({
 	following: {},
 	followers: [],
 	accounts: [],
-	totals: {},
+	accountsFiltered: [],
+	totals: {
+		followers: 0,
+		following: 0,
+		filtered: 0,
+		_: 0,
+	},
+	page: 0,
+	filter: '',
+	search: '',
 	setFollowing: (content: ItfExportFollowing) => {},
 	setFollowers: (content: ItfExport[]) => {},
 	isFollowing: (content: ItfExport[] | ItfExportFollowing): boolean => false,
 	isFollowers: (content: ItfExport[] | ItfExportFollowing): boolean => false,
+	setPage: (p: number) => {},
+	setFilter: (f: ItfFilterTypes) => {},
+	setSearch: (f: string) => {},
 });
 
 const useInfo = () => {
