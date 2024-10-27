@@ -190,10 +190,8 @@ const InfoProvider = ({
 
 		if (search) {
 			_accountsFiltered = _accountsFiltered.filter((account) => {
-				return (
-					account.value.includes(search) ||
-					account.href.includes(search)
-				);
+				return account.value.includes(search);
+				//|| account.href.includes(search)
 			});
 		}
 
