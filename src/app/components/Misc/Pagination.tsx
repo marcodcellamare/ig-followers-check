@@ -17,7 +17,7 @@ const Pagination = () => {
 		let _pagesArray = [];
 		const _pages = Math.ceil(totals.filtered / Config.itemsPerPage);
 		const _start =
-			page > Math.round(Config.pagination / 2)
+			page > Math.round(Config.pagination / 2) - 1
 				? page - Math.round(Config.pagination / 2) + 1
 				: 0;
 		const _end =
