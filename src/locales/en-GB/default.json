@@ -1,15 +1,21 @@
 {
-	"TITLE": "IG Followers Check",
+	"TITLE": "Instagram followers check",
+	"DESCRIPTION": "Check your Instagram followers against the ones you are following, easily.",
+	"IG_DATA": "To export your Instagram data, click here:",
+	"IG_DATA_LINK": "https://www.instagram.com/download/request/",
 	"ACCOUNTS": "Accounts",
 	"ID": "ID",
 	"FOLLOWING": "Following",
 	"FOLLOWERS": "Followers",
 	"NOT_FOLLOWERS": "Not followers",
 	"FOLLOWING_BACK": "Following back",
+	"NO_RESULTS": "No results",
 	"SEARCH": "Search",
 	"ALL": "All",
 	"LINK": "Link",
 	"DATE": "Date",
 	"NOT_FOLLOWERS_ERROR": "It's the wrong file, you have to upload the Followers file here.",
-	"NOT_FOLLOWING_ERROR": "It's the wrong file, you have to upload the Following file here."
+	"NOT_FOLLOWING_ERROR": "It's the wrong file, you have to upload the Following file here.",
+	"FOOTER": "Code written by Marco D. Cellamare",
+	"REPO": "https://github.com/marcodcellamare/ig-followers-check"
 }

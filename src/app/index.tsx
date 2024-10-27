@@ -1,3 +1,4 @@
+import Package from '@package';
 import { Helmet } from 'react-helmet-async';
 import { useTranslation } from 'react-i18next';
 import { InfoProvider } from '@providers/info';
@@ -10,7 +11,9 @@ const App = () => {
 	return (
 		<>
 			<Helmet
-				titleTemplate={'%s - ' + i18n.t('TITLE')}
+				titleTemplate={`%s - ${i18n.t('TITLE')} (${
+					'v' + Package.version
+				})`}
 				defaultTitle={i18n.t('TITLE')}
 				htmlAttributes={{ lang: i18n.language }}
 			/>

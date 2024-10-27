@@ -11,40 +11,29 @@ import {
 const Pagination = () => {
 	const { totals, page, setPage } = useInfo();
 	const [pages, setPages] = useState(0);
-	const [start, setStart] = useState(0);
-	const [end, setEnd] = useState(0);
 	const [pagesArray, setPagesArray] = useState([]);
 
 	useEffect(() => {
-		setPages(Math.ceil(totals.filtered / Config.itemsPerPage));
-	}, [totals.filtered]);
-
-	useEffect(() => {
-		setStart(
-			page > Math.round(Config.pagination / 2)
-				? page - Math.round(Config.pagination / 2)
-				: 0
-		);
-	}, [page]);
-
-	useEffect(() => {
-		setEnd(
-			page <= pages - Math.round(Config.pagination / 2)
-				? start + Config.pagination
-				: pages
-		);
-	}, [page, start, pages]);
-
-	useEffect(() => {
 		let _pagesArray = [];
+		const _pages = Math.ceil(totals.filtered / Config.itemsPerPage);
+		const _start =
+			page > Math.round(Config.pagination / 2)
+				? page - Math.round(Config.pagination / 2) + 1
+				: 0;
+		const _end =
+			page <= _pages - Math.round(Config.pagination / 2) &&
+			_pages >= Config.pagination
+				? _start + Config.pagination
+				: _pages;
 
-		if (end > start) {
-			for (let k = start; k < end; k++) {
+		if (_end > _start) {
+			for (let k = _start; k < _end; k++) {
 				_pagesArray.push(k);
 			}
 		}
+		setPages(_pages);
 		setPagesArray(_pagesArray);
-	}, [start, end, pages, page, totals.filtered]);
+	}, [totals.filtered, page]);
 
 	return pagesArray.length > 1 ? (
 		<nav>

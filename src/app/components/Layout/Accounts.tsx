@@ -47,7 +47,10 @@ const Accounts = () => {
 						})}
 					</tbody>
 				</table>
-			) : null}
+			) : (
+				<p className='fw-bold text-danger'>{i18n.t('NO_RESULTS')}</p>
+			)}
+			<hr />
 		</section>
 	);
 };
