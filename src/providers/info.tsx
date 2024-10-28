@@ -176,7 +176,7 @@ const InfoProvider = ({
 		});
 		merged.sort(
 			(a: ItfData, b: ItfData) =>
-				a.info.following.timestamp - b.info.following.timestamp ||
+				a.info.following?.timestamp - b.info.following?.timestamp ||
 				a.value.localeCompare(b.value)
 		);
 		setAccounts(merged);
@@ -184,19 +184,19 @@ const InfoProvider = ({
 
 	useEffect(() => {
 		const totalFollowers = accounts.filter(
-			(account) => account.info._._ === true
+			(account) => account.info._?._ === true
 		).length;
 		const totalFollowing = accounts.filter(
-			(account) => account.info.following._ === true
+			(account) => account.info.following?._ === true
 		).length;
 		const totalNotFollowers = accounts.filter(
 			(account) =>
-				account.info._._ === false &&
-				account.info.blocked_users._ === false &&
-				account.info.following_hashtags._ === false &&
-				account.info.follow_requests_sent._ === false &&
-				account.info.unfollowed_users._ === false &&
-				account.info.dismissed_suggested_users._ === false
+				account.info._?._ === false &&
+				account.info.blocked_users?._ === false &&
+				account.info.following_hashtags?._ === false &&
+				account.info.follow_requests_sent?._ === false &&
+				account.info.unfollowed_users?._ === false &&
+				account.info.dismissed_suggested_users?._ === false
 		).length;
 		const total = accounts.length;
 		let _accountsFiltered = accounts;
@@ -207,19 +207,19 @@ const InfoProvider = ({
 			_accountsFiltered = _accountsFiltered.filter((account) => {
 				switch (filter) {
 					case 'followers':
-						return account.info._._ === true;
+						return account.info._?._ === true;
 
 					case 'following':
-						return account.info.following._ === true;
+						return account.info.following?._ === true;
 
 					case 'not_followers':
 						return (
-							account.info._._ === false &&
-							account.info.blocked_users._ === false &&
-							account.info.following_hashtags._ === false &&
-							account.info.follow_requests_sent._ === false &&
-							account.info.unfollowed_users._ === false &&
-							account.info.dismissed_suggested_users._ === false
+							account.info._?._ === false &&
+							account.info.blocked_users?._ === false &&
+							account.info.following_hashtags?._ === false &&
+							account.info.follow_requests_sent?._ === false &&
+							account.info.unfollowed_users?._ === false &&
+							account.info.dismissed_suggested_users?._ === false
 						);
 
 					default:

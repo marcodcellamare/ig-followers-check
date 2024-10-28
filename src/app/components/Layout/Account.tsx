@@ -23,14 +23,14 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 
 	useEffect(() => {
 		if (
-			!account.info._._ &&
-			account.info.following._ &&
-			account.info.following.timestamp
+			!account.info._?._ &&
+			account.info.following?._ &&
+			account.info.following?.timestamp
 		) {
 			const date = new Date();
 			date.setDate(date.getDate() - 14);
 
-			setOlder(timestampToDate(account.info.following.timestamp) < date);
+			setOlder(timestampToDate(account.info.following?.timestamp) < date);
 		}
 		return () => setOlder(false);
 	}, [account]);
@@ -38,9 +38,9 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 	return account ? (
 		<tr
 			className={
-				account.info.blocked_users._
+				account.info.blocked_users?._
 					? 'table-danger'
-					: !account.info._._
+					: !account.info._?._
 					? 'table-warning'
 					: ''
 			}>
@@ -55,7 +55,7 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 					target='_blank'
 					rel='noreferrer'
 					className={`fw-bold${
-						!account.info._._ ? ' text-danger' : ''
+						!account.info._?._ ? ' text-danger' : ''
 					}`}>
 					{older ? (
 						<ExclamationTriangle className='me-1 text-danger' />
@@ -64,14 +64,14 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 				</a>
 			</td>
 			<td className='text-nowrap'>
-				{account.info.blocked_users._ ||
-				account.info.close_friends._ ||
-				account.info.following_hashtags._ ||
-				account.info.follow_requests_sent._ ||
-				account.info.permanent_follow_requests._ ||
-				account.info.unfollowed_users._ ? (
+				{account.info.blocked_users?._ ||
+				account.info.close_friends?._ ||
+				account.info.following_hashtags?._ ||
+				account.info.follow_requests_sent?._ ||
+				account.info.permanent_follow_requests?._ ||
+				account.info.unfollowed_users?._ ? (
 					<ul className='list-inline text-end my-0'>
-						{account.info.blocked_users._ ? (
+						{account.info.blocked_users?._ ? (
 							<li className='list-inline-item'>
 								<span className='badge text-bg-danger'>
 									<Ban className='me-1' />
@@ -79,7 +79,7 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 								</span>
 							</li>
 						) : null}
-						{account.info.close_friends._ ? (
+						{account.info.close_friends?._ ? (
 							<li className='list-inline-item'>
 								<span className='badge text-bg-primary'>
 									<Star className='me-1' />
@@ -87,7 +87,7 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 								</span>
 							</li>
 						) : null}
-						{account.info.following_hashtags._ ? (
+						{account.info.following_hashtags?._ ? (
 							<li className='list-inline-item'>
 								<span className='badge text-bg-warning'>
 									<Hash className='me-1' />
@@ -95,7 +95,7 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 								</span>
 							</li>
 						) : null}
-						{account.info.follow_requests_sent._ ? (
+						{account.info.follow_requests_sent?._ ? (
 							<li className='list-inline-item'>
 								<span className='badge text-bg-warning'>
 									<HourglassSplit className='me-1' />
@@ -103,7 +103,7 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 								</span>
 							</li>
 						) : null}
-						{account.info.permanent_follow_requests._ ? (
+						{account.info.permanent_follow_requests?._ ? (
 							<li className='list-inline-item'>
 								<span className='badge text-bg-info'>
 									<Clock className='me-1' />
@@ -111,7 +111,7 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 								</span>
 							</li>
 						) : null}
-						{account.info.unfollowed_users._ ? (
+						{account.info.unfollowed_users?._ ? (
 							<li className='list-inline-item'>
 								<span className='badge text-bg-secondary'>
 									<ClockHistory className='me-1' />
@@ -123,15 +123,15 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 				) : null}
 			</td>
 			<td className='text-nowrap'>
-				{account.info._._ ? (
+				{account.info._?._ ? (
 					<CheckCircle className='text-success' />
 				) : (
 					<XCircle className='text-danger' />
 				)}
-				{account.info._.timestamp ? (
+				{account.info._?.timestamp ? (
 					<span className='small ms-1 text-muted'>
 						{
-							timestampToDate(account.info._.timestamp)
+							timestampToDate(account.info._?.timestamp)
 								.toISOString()
 								.split('T')[0]
 						}
@@ -139,15 +139,15 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 				) : null}
 			</td>
 			<td className='text-nowrap'>
-				{account.info.following._ ? (
+				{account.info.following?._ ? (
 					<CheckCircle className='text-success' />
 				) : (
 					<XCircle className='text-danger' />
 				)}
-				{account.info.following.timestamp ? (
+				{account.info.following?.timestamp ? (
 					<span className='small ms-1 text-muted'>
 						{
-							timestampToDate(account.info.following.timestamp)
+							timestampToDate(account.info.following?.timestamp)
 								.toISOString()
 								.split('T')[0]
 						}
