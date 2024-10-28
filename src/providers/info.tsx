@@ -6,20 +6,18 @@ import {
 	useState,
 } from 'react';
 import Config from '@config';
-import {
-	ItfData,
-	ItfExport,
-	ItfExportFollowing,
-	ItfFilterTypes,
-} from '@interfaces/scheme';
+import JSZip from 'jszip';
+import { inflate, deflate } from '@rescale/slim';
+import { ItfData, ItfFilterTypes } from '@interfaces/scheme';
 
 const InfoProvider = ({
 	children,
 }: {
 	children: React.ReactNode | React.ReactNode[];
 }) => {
-	const [followers, setFollowers] = useState<ItfExport[]>([]);
-	const [following, setFollowing] = useState<ItfExportFollowing>({});
+	const session = 'userData';
+	const [userData, setUserData] = useState({});
+	const [userDataTypes, setUserDataTypes] = useState([]);
 	const [accounts, setAccounts] = useState<ItfData[]>([]);
 	const [accountsFiltered, setAccountsFiltered] = useState<ItfData[]>([]);
 	const [totals, setTotals] = useState({
@@ -31,6 +29,12 @@ const InfoProvider = ({
 	const [page, setPage] = useState(0);
 	const [filter, setFilter] = useState<ItfFilterTypes>('');
 	const [search, setSearch] = useState('');
+
+	const gatedSetUserData = useCallback((d: object) => {
+		setUserData(d);
+		setUserDataTypes(Object.keys(d));
+		sessionStorage.setItem(session, deflate(d));
+	}, []);
 
 	const gatedSetPage = useCallback((p: number) => {
 		setPage(p);
@@ -46,122 +50,136 @@ const InfoProvider = ({
 		setPage(0);
 	}, []);
 
-	const gatedSetFollowers = useCallback((content: ItfExport[]) => {
-		setFollowers(content);
-		sessionStorage.setItem('followers', JSON.stringify(content));
-	}, []);
+	const zipToUserData = useCallback(
+		(file: File) => {
+			try {
+				let fullJson = {};
 
-	const gatedSetFollowing = useCallback((content: ItfExportFollowing) => {
-		setFollowing(content);
-		sessionStorage.setItem('following', JSON.stringify(content));
-	}, []);
+				JSZip.loadAsync(file)
+					.then((zip) => {
+						const total = Object.keys(zip.files).filter(
+							(file) =>
+								file.startsWith(
+									'connections/followers_and_following/'
+								) && file.endsWith('.json')
+						).length;
+						let k = 0;
 
-	const isFollowing = useCallback(
-		(content: ItfExport[] | ItfExportFollowing): boolean => {
-			return (
-				typeof content === 'object' &&
-				!Array.isArray(content) &&
-				Array.isArray(content[Config.data.following.root]) &&
-				content[Config.data.following.root][0].hasOwnProperty(
-					'title'
-				) &&
-				content[Config.data.following.root][0].hasOwnProperty(
-					'media_list_data'
-				) &&
-				content[Config.data.following.root][0].hasOwnProperty(
-					'string_list_data'
-				)
-			);
-		},
-		[]
-	);
+						zip.forEach((path, file) => {
+							if (
+								file.name.startsWith(
+									'connections/followers_and_following/'
+								) &&
+								file.name.endsWith('.json')
+							) {
+								file.async('text')
+									.then((content) => {
+										const json = JSON.parse(content);
 
-	const isFollowers = useCallback(
-		(content: ItfExport[] | ItfExportFollowing): boolean => {
-			return (
-				Array.isArray(content) &&
-				content[0].hasOwnProperty('title') &&
-				content[0].hasOwnProperty('media_list_data') &&
-				content[0].hasOwnProperty('string_list_data')
-			);
-		},
-		[]
-	);
+										if (!Array.isArray(json)) {
+											Object.keys(json).forEach((t) => {
+												const _t = t.replace(
+													Config.data.typeCleanup,
+													''
+												);
 
-	const flatten = ({ data, root, info }) => {
-		return (root && Array.isArray(data[root]) ? data[root] : data)
-			.map((r: ItfExport) => r[info])
-			.flat(1);
-	};
-	const merge = ({ merged, data, type }) => {
-		data.forEach((d: ItfData) => {
-			let idx = merged.findIndex((m: ItfData) => m.value === d.value);
-
-			if (idx === -1) {
-				merged.push({
-					...d,
-					following: false,
-					followingTimestamp: 0,
-					followingDate: false,
-					followers: false,
-					followersTimestamp: 0,
-					followersDate: false,
-				});
-				idx = merged.findIndex((m: ItfData) => m.value === d.value);
+												if (
+													!fullJson.hasOwnProperty(_t)
+												) {
+													fullJson[_t] = [];
+												}
+												fullJson[_t] = [
+													...fullJson[_t],
+													...json[t],
+												];
+											});
+										} else {
+											if (!fullJson.hasOwnProperty('_')) {
+												fullJson['_'] = [];
+											}
+											fullJson['_'] = [
+												...fullJson['_'],
+												...json,
+											];
+										}
+									})
+									.catch((err) => {
+										throw Object.assign(new Error(err), {
+											code: 406,
+										});
+									})
+									.finally(() => {
+										if (k >= total - 1) {
+											gatedSetUserData(fullJson);
+										}
+										k++;
+									});
+							}
+						});
+					})
+					.catch((err) => {
+						throw Object.assign(new Error(err), {
+							code: 406,
+						});
+					});
+			} catch (err) {
+				console.error(err);
 			}
-			merged[idx][type] = true;
-			merged[idx][`${type}Timestamp`] = d.timestamp;
-			merged[idx][`${type}Date`] = new Date(d.timestamp * 1000);
-		});
-		return merged;
-	};
+		},
+		[gatedSetUserData]
+	);
 
 	useEffect(() => {
-		let followingFlatten = [];
-		let followersFlatten = [];
 		let merged = [];
+		let types = {};
 
-		if (
-			following &&
-			isFollowing(following) &&
-			followers &&
-			isFollowers(followers)
-		) {
-			followingFlatten = flatten({
-				data: following,
-				root: Config.data.following.root,
-				info: Config.data.following.info,
+		userDataTypes.forEach((t) => {
+			types = {
+				...types,
+				[t]: { _: false, timestamp: 0 },
+			};
+		});
+
+		Object.keys(userData).forEach((type: string) => {
+			userData[type].forEach((datas) => {
+				datas.string_list_data.forEach((data: ItfData) => {
+					let idx = merged.findIndex(
+						(m: ItfData) => m.href === data.href
+					);
+					if (idx === -1) {
+						merged.push({
+							...data,
+							value: data.value ?? data.href.split('/').pop(),
+							info: types,
+						});
+						idx = merged.findIndex(
+							(m: ItfData) => m.href === data.href
+						);
+					}
+					merged[idx].info = {
+						...merged[idx].info,
+						[type]: {
+							_: true,
+							timestamp: data.timestamp,
+						},
+					};
+				});
 			});
-			followersFlatten = flatten({
-				data: followers,
-				root: Config.data.followers.root,
-				info: Config.data.followers.info,
-			});
-			merged = merge({
-				merged,
-				data: followingFlatten,
-				type: 'following',
-			});
-			merged = merge({
-				merged,
-				data: followersFlatten,
-				type: 'followers',
-			});
-			merged.sort(
-				(a: ItfData, b: ItfData) =>
-					a.followingTimestamp - b.followingTimestamp ||
-					a.value.localeCompare(b.value)
-			);
-		}
+		});
+		merged.sort(
+			(a: ItfData, b: ItfData) =>
+				a.info.following.timestamp - b.info.following.timestamp ||
+				a.value.localeCompare(b.value)
+		);
 		setAccounts(merged);
-	}, [followers, following, isFollowers, isFollowing]);
+	}, [userData, userDataTypes]);
 
 	useEffect(() => {
 		const totalFollowers = accounts.filter(
-			(account) => account.followers === true
+			(account) => account.info._._ === true
 		).length;
 		const totalFollowing = accounts.filter(
-			(account) => account.following === true
+			(account) => account.info.following._ === true
 		).length;
 		const total = accounts.length;
 		let _accountsFiltered = accounts;
@@ -172,13 +190,13 @@ const InfoProvider = ({
 			_accountsFiltered = _accountsFiltered.filter((account) => {
 				switch (filter) {
 					case 'followers':
-						return account.followers === true;
+						return account.info._._ === true;
 
 					case 'following':
-						return account.following === true;
+						return account.info.following._ === true;
 
 					case 'not_followers':
-						return account.followers === false;
+						return account.info._._ === false;
 
 					default:
 						return true;
@@ -215,28 +233,22 @@ const InfoProvider = ({
 	}, [accounts, page, filter, search]);
 
 	useEffect(() => {
-		const _followers = sessionStorage.getItem('followers');
-		const _following = sessionStorage.getItem('following');
-
-		if (_followers) setFollowers(JSON.parse(_followers));
-		if (_following) setFollowing(JSON.parse(_following));
-	}, []);
+		const _userData = sessionStorage.getItem(session);
+		if (_userData) gatedSetUserData(inflate(_userData));
+	}, [gatedSetUserData]);
 
 	return (
 		<InfoContext.Provider
 			value={{
-				following,
-				followers,
+				zipToUserData,
+				userData,
 				accounts,
 				accountsFiltered,
 				totals,
 				page,
 				filter,
 				search,
-				setFollowing: gatedSetFollowing,
-				setFollowers: gatedSetFollowers,
-				isFollowing,
-				isFollowers,
+				setUserData: gatedSetUserData,
 				setPage: gatedSetPage,
 				setFilter: gatedSetFilter,
 				setSearch: gatedSetSearch,
@@ -246,8 +258,8 @@ const InfoProvider = ({
 	);
 };
 const InfoContext = createContext({
-	following: {},
-	followers: [],
+	zipToUserData: (file: File) => {},
+	userData: {},
 	accounts: [],
 	accountsFiltered: [],
 	totals: {
@@ -259,10 +271,7 @@ const InfoContext = createContext({
 	page: 0,
 	filter: '',
 	search: '',
-	setFollowing: (content: ItfExportFollowing) => {},
-	setFollowers: (content: ItfExport[]) => {},
-	isFollowing: (content: ItfExport[] | ItfExportFollowing): boolean => false,
-	isFollowers: (content: ItfExport[] | ItfExportFollowing): boolean => false,
+	setUserData: (content: object) => {},
 	setPage: (p: number) => {},
 	setFilter: (f: ItfFilterTypes) => {},
 	setSearch: (f: string) => {},

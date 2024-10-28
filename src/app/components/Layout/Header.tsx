@@ -7,16 +7,11 @@ import Reset from '@components/Misc/Reset';
 import File from '@components/Misc/File';
 import Filter from '@components/Misc/Filter';
 import Search from '@components/Misc/Search';
-import {
-	ItfExport,
-	ItfExportFollowing,
-	ItfFilterTypes,
-} from '@interfaces/scheme';
+import { ItfFilterTypes } from '@interfaces/scheme';
 
 const Header = () => {
 	const { i18n } = useTranslation();
-	const { totals, setFollowers, setFollowing, setFilter, setSearch, filter } =
-		useInfo();
+	const { totals, setFilter, setSearch, filter, zipToUserData } = useInfo();
 
 	const types: ItfFilterTypes[] = [
 		'followers',
@@ -130,23 +125,12 @@ const Header = () => {
 						</div>
 					</div>
 					<div className='row gy-3'>
-						<div className='col-12 col-md-6'>
+						<div className='col-12'>
 							<File
-								type='followers'
-								label={i18n.t('FOLLOWERS')}
-								onFileSelected={(content: ItfExport[]) => {
-									setFollowers(content);
-								}}
-							/>
-						</div>
-						<div className='col-12 col-md-6'>
-							<File
-								type='following'
-								label={i18n.t('FOLLOWING')}
-								onFileSelected={(
-									content: ItfExportFollowing
-								) => {
-									setFollowing(content);
+								label={i18n.t('ZIP_FILE')}
+								accept='.zip'
+								onFileSelected={(file) => {
+									zipToUserData(file);
 								}}
 							/>
 						</div>

@@ -1,73 +1,20 @@
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useInfo } from '@providers/info';
 import { v4 as uuidv4 } from 'uuid';
-import { ItfExport, ItfExportFollowing } from '@interfaces/scheme';
 
 const File = ({
-	type = '',
 	label,
-	accept = '.json',
+	accept = '.zip',
 	onFileSelected,
 }: {
-	type?: '' | 'following' | 'followers';
 	label: string;
 	accept?: string;
-	onFileSelected: (content: ItfExport[] | ItfExportFollowing) => void;
+	onFileSelected: (file: File) => void;
 }) => {
-	const { i18n } = useTranslation();
-	const { isFollowing, isFollowers } = useInfo();
 	const [id, setId] = useState('');
 
 	const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target && e.target.files && e.target.files[0]) {
-			const file = e.target.files[0];
-			const reader = new FileReader();
-
-			reader.onload = (r) => {
-				try {
-					if (typeof r.target.result === 'string') {
-						const content: ItfExport[] | ItfExportFollowing =
-							JSON.parse(r.target.result);
-
-						switch (type) {
-							case 'followers':
-								if (!isFollowers(content))
-									throw Object.assign(
-										new Error(
-											i18n.t('NOT_FOLLOWERS_ERROR')
-										),
-										{
-											code: 406,
-										}
-									);
-								break;
-
-							case 'following':
-								if (!isFollowing(content))
-									throw Object.assign(
-										new Error(
-											i18n.t('NOT_FOLLOWING_ERROR')
-										),
-										{
-											code: 406,
-										}
-									);
-								break;
-
-							default:
-						}
-						onFileSelected(content);
-					}
-				} catch (err) {
-					console.error(err);
-					alert(err);
-				}
-			};
-			reader.onerror = (err) => {
-				console.error(err);
-			};
-			reader.readAsText(file, 'UTF-8');
+			onFileSelected(e.target.files[0]);
 		}
 	};
 

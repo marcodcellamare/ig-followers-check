@@ -51,14 +51,8 @@
 		]
 	},
 	"data": {
-		"followers": {
-			"root": "",
-			"info": "string_list_data"
-		},
-		"following": {
-			"root": "relationships_following",
-			"info": "string_list_data"
-		}
+		"typeCleanup": "relationships_",
+		"zipPath": "connections/followers_and_following/"
 	},
 	"itemsPerPage": 50,
 	"pagination": 7

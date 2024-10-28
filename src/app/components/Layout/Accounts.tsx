@@ -13,40 +13,46 @@ const Accounts = () => {
 				<title>{i18n.t('ACCOUNTS')}</title>
 			</Helmet>
 			{accountsFiltered.length > 0 ? (
-				<table className='table table-sm table-hover'>
-					<thead>
-						<tr>
-							<th
-								scope='col'
-								className='text-end pe-2'
-								style={{ width: '1px' }}>
-								#
-							</th>
-							<th scope='col'>{i18n.t('ID')}</th>
-							<th
-								scope='col'
-								style={{ width: '1px' }}>
-								{i18n.t('FOLLOWERS')}
-							</th>
-							<th
-								scope='col'
-								style={{ width: '1px' }}>
-								{i18n.t('FOLLOWING')}
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						{accountsFiltered.map((account, k) => {
-							return (
-								<Account
-									key={k}
-									k={k}
-									account={account}
+				<div className='table-responsive'>
+					<table className='table table-sm table-hover'>
+						<thead>
+							<tr>
+								<th
+									scope='col'
+									className='text-end pe-2'
+									style={{ width: '1px' }}>
+									#
+								</th>
+								<th scope='col'>{i18n.t('ID')}</th>
+								<th
+									scope='col'
+									style={{ width: '1px' }}
 								/>
-							);
-						})}
-					</tbody>
-				</table>
+								<th
+									scope='col'
+									style={{ width: '1px' }}>
+									{i18n.t('FOLLOWERS')}
+								</th>
+								<th
+									scope='col'
+									style={{ width: '1px' }}>
+									{i18n.t('FOLLOWING')}
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{accountsFiltered.map((account, k) => {
+								return (
+									<Account
+										key={k}
+										k={k}
+										account={account}
+									/>
+								);
+							})}
+						</tbody>
+					</table>
+				</div>
 			) : (
 				<p className='fw-bold text-danger'>{i18n.t('NO_RESULTS')}</p>
 			)}
