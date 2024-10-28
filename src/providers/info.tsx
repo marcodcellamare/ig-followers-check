@@ -134,7 +134,7 @@ const InfoProvider = ({
 				console.error(err);
 			}
 		},
-		[gatedSetUserData]
+		[gatedSetUserData, gatedSetUserDataName]
 	);
 
 	useEffect(() => {

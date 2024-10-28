@@ -2,8 +2,6 @@ import Package from '@package';
 import { Instagram, Link45deg } from 'react-bootstrap-icons';
 import { useTranslation } from 'react-i18next';
 import { useInfo } from '@providers/info';
-import Pagination from '@components/Misc/Pagination';
-import Reset from '@components/Misc/Reset';
 import File from '@components/Misc/File';
 import Filter from '@components/Misc/Filter';
 import Search from '@components/Misc/Search';
