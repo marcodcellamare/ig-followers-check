@@ -8,6 +8,7 @@ import {
 	Hash,
 	HourglassSplit,
 	Star,
+	XCircle,
 } from 'react-bootstrap-icons';
 import { useTranslation } from 'react-i18next';
 import { useInfo } from '@providers/info';
@@ -123,12 +124,12 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 			</td>
 			<td className='text-nowrap'>
 				{account.info._._ ? (
-					<CheckCircle />
+					<CheckCircle className='text-success' />
 				) : (
-					<Ban className='text-danger' />
+					<XCircle className='text-danger' />
 				)}
 				{account.info._.timestamp ? (
-					<span className='small ms-1'>
+					<span className='small ms-1 text-muted'>
 						{
 							timestampToDate(account.info._.timestamp)
 								.toISOString()
@@ -139,12 +140,12 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 			</td>
 			<td className='text-nowrap'>
 				{account.info.following._ ? (
-					<CheckCircle />
+					<CheckCircle className='text-success' />
 				) : (
-					<Ban className='text-danger' />
+					<XCircle className='text-danger' />
 				)}
 				{account.info.following.timestamp ? (
-					<span className='small ms-1'>
+					<span className='small ms-1 text-muted'>
 						{
 							timestampToDate(account.info.following.timestamp)
 								.toISOString()

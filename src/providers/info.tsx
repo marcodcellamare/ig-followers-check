@@ -17,12 +17,14 @@ const InfoProvider = ({
 }) => {
 	const session = 'userData';
 	const [userData, setUserData] = useState({});
+	const [userDataName, setUserDataName] = useState('');
 	const [userDataTypes, setUserDataTypes] = useState([]);
 	const [accounts, setAccounts] = useState<ItfData[]>([]);
 	const [accountsFiltered, setAccountsFiltered] = useState<ItfData[]>([]);
 	const [totals, setTotals] = useState({
 		followers: 0,
 		following: 0,
+		not_followers: 0,
 		filtered: 0,
 		_: 0,
 	});
@@ -34,6 +36,11 @@ const InfoProvider = ({
 		setUserData(d);
 		setUserDataTypes(Object.keys(d));
 		sessionStorage.setItem(session, deflate(d));
+	}, []);
+
+	const gatedSetUserDataName = useCallback((n: string) => {
+		setUserDataName(n);
+		sessionStorage.setItem(`${session}Name`, n);
 	}, []);
 
 	const gatedSetPage = useCallback((p: number) => {
@@ -58,21 +65,21 @@ const InfoProvider = ({
 				JSZip.loadAsync(file)
 					.then((zip) => {
 						const total = Object.keys(zip.files).filter(
-							(file) =>
-								file.startsWith(
+							(f) =>
+								f.startsWith(
 									'connections/followers_and_following/'
-								) && file.endsWith('.json')
+								) && f.endsWith('.json')
 						).length;
 						let k = 0;
 
-						zip.forEach((path, file) => {
+						zip.forEach((path, f) => {
 							if (
-								file.name.startsWith(
+								f.name.startsWith(
 									'connections/followers_and_following/'
 								) &&
-								file.name.endsWith('.json')
+								f.name.endsWith('.json')
 							) {
-								file.async('text')
+								f.async('text')
 									.then((content) => {
 										const json = JSON.parse(content);
 
@@ -111,6 +118,7 @@ const InfoProvider = ({
 									.finally(() => {
 										if (k >= total - 1) {
 											gatedSetUserData(fullJson);
+											gatedSetUserDataName(file.name);
 										}
 										k++;
 									});
@@ -181,6 +189,15 @@ const InfoProvider = ({
 		const totalFollowing = accounts.filter(
 			(account) => account.info.following._ === true
 		).length;
+		const totalNotFollowers = accounts.filter(
+			(account) =>
+				account.info._._ === false &&
+				account.info.blocked_users._ === false &&
+				account.info.following_hashtags._ === false &&
+				account.info.follow_requests_sent._ === false &&
+				account.info.unfollowed_users._ === false &&
+				account.info.dismissed_suggested_users._ === false
+		).length;
 		const total = accounts.length;
 		let _accountsFiltered = accounts;
 
@@ -196,7 +213,14 @@ const InfoProvider = ({
 						return account.info.following._ === true;
 
 					case 'not_followers':
-						return account.info._._ === false;
+						return (
+							account.info._._ === false &&
+							account.info.blocked_users._ === false &&
+							account.info.following_hashtags._ === false &&
+							account.info.follow_requests_sent._ === false &&
+							account.info.unfollowed_users._ === false &&
+							account.info.dismissed_suggested_users._ === false
+						);
 
 					default:
 						return true;
@@ -209,7 +233,6 @@ const InfoProvider = ({
 		if (search) {
 			_accountsFiltered = _accountsFiltered.filter((account) => {
 				return account.value.includes(search);
-				//|| account.href.includes(search)
 			});
 		}
 
@@ -218,6 +241,7 @@ const InfoProvider = ({
 		setTotals({
 			followers: totalFollowers,
 			following: totalFollowing,
+			not_followers: totalNotFollowers,
 			filtered: _accountsFiltered.length,
 			_: total,
 		});
@@ -234,14 +258,18 @@ const InfoProvider = ({
 
 	useEffect(() => {
 		const _userData = sessionStorage.getItem(session);
+		const _userDataName = sessionStorage.getItem(`${session}Name`);
+
 		if (_userData) gatedSetUserData(inflate(_userData));
-	}, [gatedSetUserData]);
+		if (_userDataName) gatedSetUserDataName(_userDataName);
+	}, [gatedSetUserData, gatedSetUserDataName]);
 
 	return (
 		<InfoContext.Provider
 			value={{
 				zipToUserData,
 				userData,
+				userDataName,
 				accounts,
 				accountsFiltered,
 				totals,
@@ -260,11 +288,13 @@ const InfoProvider = ({
 const InfoContext = createContext({
 	zipToUserData: (file: File) => {},
 	userData: {},
+	userDataName: '',
 	accounts: [],
 	accountsFiltered: [],
 	totals: {
 		followers: 0,
 		following: 0,
+		not_followers: 0,
 		filtered: 0,
 		_: 0,
 	},

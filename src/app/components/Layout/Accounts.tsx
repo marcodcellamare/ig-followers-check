@@ -56,7 +56,6 @@ const Accounts = () => {
 			) : (
 				<p className='fw-bold text-danger'>{i18n.t('NO_RESULTS')}</p>
 			)}
-			<hr />
 		</section>
 	);
 };

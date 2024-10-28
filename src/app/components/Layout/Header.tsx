@@ -35,8 +35,8 @@ const Header = () => {
 		}
 	};
 	return (
-		<header>
-			<div className='row d-flex align-items-center my-4'>
+		<header className='overflow-hidden'>
+			<div className='row d-flex align-items-center my-5'>
 				<div className='col-12 col-lg-5 col-xxl-7 pe-xl-5'>
 					<div className='row d-flex align-items-center mb-3 mb-lg-0 text-primary'>
 						<div className='col-auto'>
@@ -74,10 +74,6 @@ const Header = () => {
 												total={
 													!type
 														? totals._
-														: type ===
-														  'not_followers'
-														? totals._ -
-														  totals.followers
 														: totals[type]
 												}
 												active={filter === type}
@@ -103,7 +99,7 @@ const Header = () => {
 			</div>
 			{totals._ === 0 ? (
 				<>
-					<div className='row mb-3'>
+					<div className='row my-5'>
 						<div className='col-12'>
 							<div className='alert alert-primary my-0'>
 								<div className='row'>
@@ -136,17 +132,7 @@ const Header = () => {
 						</div>
 					</div>
 				</>
-			) : (
-				<div className='row g-2 mt-3'>
-					<div className='col'>
-						<Pagination />
-					</div>
-					<div className='col-auto'>
-						<Reset />
-					</div>
-				</div>
-			)}
-			<hr />
+			) : null}
 		</header>
 	);
 };
