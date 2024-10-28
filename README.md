@@ -5,3 +5,5 @@ A script that checks your Instagram account exported data, to show you who is fo
 To export your Instagram data, go here: https://www.instagram.com/download/request/
 
 Remember to request to download the "JSON" version.
+
+Demo: https://instagram-followers-check.github.io/
