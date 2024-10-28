@@ -1,4 +1,4 @@
-# IG Followers Check
+# Instagram followers check
 
 A script that checks your Instagram account exported data, to show you who is following you back and who's not.
 
