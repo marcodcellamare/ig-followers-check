@@ -6,4 +6,4 @@ To export your Instagram data, go here: https://www.instagram.com/download/reque
 
 Remember to request to download the "JSON" version.
 
-Demo: https://instagram-followers-check.github.io/
+Demo: https://marcodcellamare.github.io/ig-followers-check/
