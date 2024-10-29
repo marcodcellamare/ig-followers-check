@@ -45,6 +45,10 @@ const InfoProvider = ({
 
 	const gatedSetPage = useCallback((p: number) => {
 		setPage(p);
+		window.scrollTo({
+			top: 0,
+			behavior: 'smooth',
+		});
 	}, []);
 
 	const gatedSetFilter = useCallback((f: ItfFilterTypes) => {

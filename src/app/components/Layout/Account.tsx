@@ -9,6 +9,7 @@ import {
 	HourglassSplit,
 	Star,
 	XCircle,
+	XLg,
 } from 'react-bootstrap-icons';
 import { useTranslation } from 'react-i18next';
 import { useInfo } from '@providers/info';
@@ -28,7 +29,7 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 			account.info.following?.timestamp
 		) {
 			const date = new Date();
-			date.setDate(date.getDate() - 14);
+			date.setDate(date.getDate() - Config.data.getOld);
 
 			setOlder(timestampToDate(account.info.following?.timestamp) < date);
 		}
@@ -40,6 +41,9 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 			className={
 				account.info.blocked_users?._
 					? 'table-danger'
+					: account.info.dismissed_suggested_users?._ &&
+					  !account.info._?._
+					? 'table-secondary'
 					: !account.info._?._
 					? 'table-warning'
 					: ''
@@ -55,13 +59,28 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 					target='_blank'
 					rel='noreferrer'
 					className={`fw-bold${
-						!account.info._?._ ? ' text-danger' : ''
+						account.info.dismissed_suggested_users?._ &&
+						!account.info._?._
+							? ' text-secondary'
+							: !account.info._?._
+							? ' text-danger'
+							: ''
 					}`}>
 					{older ? (
 						<ExclamationTriangle className='me-1 text-danger' />
 					) : null}
 					{account.value}
 				</a>
+				{older ? (
+					<>
+						<br />
+						<small className='text-muted'>
+							{i18n.t('OLDER_THAN', {
+								days: Config.data.getOld,
+							})}
+						</small>
+					</>
+				) : null}
 			</td>
 			<td className='text-nowrap'>
 				{account.info.blocked_users?._ ||
@@ -69,7 +88,8 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 				account.info.following_hashtags?._ ||
 				account.info.follow_requests_sent?._ ||
 				account.info.permanent_follow_requests?._ ||
-				account.info.unfollowed_users?._ ? (
+				account.info.unfollowed_users?._ ||
+				account.info.dismissed_suggested_users?._ ? (
 					<ul className='list-inline text-end my-0'>
 						{account.info.blocked_users?._ ? (
 							<li className='list-inline-item'>
@@ -116,6 +136,14 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 								<span className='badge text-bg-secondary'>
 									<ClockHistory className='me-1' />
 									{i18n.t('RECENTLY_UNFOLLOWED')}
+								</span>
+							</li>
+						) : null}
+						{account.info.dismissed_suggested_users?._ ? (
+							<li className='list-inline-item'>
+								<span className='badge text-bg-secondary'>
+									<XLg className='me-1' />
+									{i18n.t('DISMISSED_SUGGESTION')}
 								</span>
 							</li>
 						) : null}

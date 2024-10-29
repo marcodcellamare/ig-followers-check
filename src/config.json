@@ -52,7 +52,8 @@
 	},
 	"data": {
 		"typeCleanup": "relationships_",
-		"zipPath": "connections/followers_and_following/"
+		"zipPath": "connections/followers_and_following/",
+		"getOld": 14
 	},
 	"itemsPerPage": 50,
 	"pagination": 7
