@@ -8,7 +8,7 @@ const Accounts = () => {
 	const { accountsFiltered } = useInfo();
 
 	return (
-		<section>
+		<section className='my-4'>
 			<Helmet>
 				<title>{i18n.t('ACCOUNTS')}</title>
 			</Helmet>
