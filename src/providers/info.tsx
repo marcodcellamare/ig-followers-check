@@ -191,12 +191,12 @@ const InfoProvider = ({
 		).length;
 		const totalNotFollowers = accounts.filter(
 			(account) =>
-				account.info._?._ === false &&
-				account.info.blocked_users?._ === false &&
-				account.info.following_hashtags?._ === false &&
-				account.info.follow_requests_sent?._ === false &&
-				account.info.unfollowed_users?._ === false &&
-				account.info.dismissed_suggested_users?._ === false
+				account.info._?._ !== true &&
+				account.info.blocked_users?._ !== true &&
+				account.info.following_hashtags?._ !== true &&
+				account.info.follow_requests_sent?._ !== true &&
+				account.info.unfollowed_users?._ !== true &&
+				account.info.dismissed_suggested_users?._ !== true
 		).length;
 		const total = accounts.length;
 		let _accountsFiltered = accounts;
@@ -205,6 +205,8 @@ const InfoProvider = ({
 
 		if (filter) {
 			_accountsFiltered = _accountsFiltered.filter((account) => {
+				console.log(account.info.blocked_users?._);
+
 				switch (filter) {
 					case 'followers':
 						return account.info._?._ === true;
@@ -214,12 +216,12 @@ const InfoProvider = ({
 
 					case 'not_followers':
 						return (
-							account.info._?._ === false &&
-							account.info.blocked_users?._ === false &&
-							account.info.following_hashtags?._ === false &&
-							account.info.follow_requests_sent?._ === false &&
-							account.info.unfollowed_users?._ === false &&
-							account.info.dismissed_suggested_users?._ === false
+							account.info._?._ !== true &&
+							account.info.blocked_users?._ !== true &&
+							account.info.following_hashtags?._ !== true &&
+							account.info.follow_requests_sent?._ !== true &&
+							account.info.unfollowed_users?._ !== true &&
+							account.info.dismissed_suggested_users?._ !== true
 						);
 
 					default:
