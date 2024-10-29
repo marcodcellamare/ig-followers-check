@@ -25,14 +25,28 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 	const [seniority, setSeniority] = useState(0);
 
 	useEffect(() => {
+		/*
 		axios
-			.get(account.href, { responseType: 'document' })
+			.get(account.href, { responseType: 'document', redirec })
 			.then((r) => {
 				console.log(r);
 			})
 			.catch((err) => {
 				console.error(err.message, account.href);
 			});
+			*/
+
+		const myHeaders = new Headers();
+		myHeaders.append('Cookie', 'csrftoken=pQnSOW3XWdrFhirVd0iRGm');
+
+		fetch(account.href, {
+			method: 'GET',
+			headers: myHeaders,
+			redirect: 'follow',
+		})
+			.then((response) => response.text())
+			.then((result) => console.log(result))
+			.catch((error) => console.error(error));
 
 		if (
 			!account.info._?._ &&
