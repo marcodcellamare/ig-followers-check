@@ -1,15 +1,14 @@
 import Package from '@package';
-import { Instagram, Link45deg } from 'react-bootstrap-icons';
+import { Instagram } from 'react-bootstrap-icons';
 import { useTranslation } from 'react-i18next';
 import { useInfo } from '@providers/info';
-import File from '@components/Misc/File';
 import Filter from '@components/Misc/Filter';
 import Search from '@components/Misc/Search';
 import { ItfFilterTypes } from '@interfaces/scheme';
 
 const Header = () => {
 	const { i18n } = useTranslation();
-	const { totals, setFilter, setSearch, filter, zipToUserData } = useInfo();
+	const { totals, setFilter, setSearch, filter } = useInfo();
 
 	const types: ItfFilterTypes[] = [
 		'followers',
@@ -33,9 +32,12 @@ const Header = () => {
 		}
 	};
 	return (
-		<header className='overflow-hidden'>
-			<div className='row d-flex align-items-center my-5'>
-				<div className='col-12 col-lg-5 col-xxl-7 pe-xl-5'>
+		<header className='my-4'>
+			<div className='row d-flex align-items-center'>
+				<div
+					className={`col-12${
+						totals._ > 0 ? ' col-lg-5 col-xxl-7 pe-xl-5' : ''
+					}`}>
 					<div className='row d-flex align-items-center mb-3 mb-lg-0 text-primary'>
 						<div className='col-auto'>
 							<span className='d-block position-relative'>
@@ -95,42 +97,6 @@ const Header = () => {
 					) : null}
 				</div>
 			</div>
-			{totals._ === 0 ? (
-				<>
-					<div className='row my-5'>
-						<div className='col-12'>
-							<div className='alert alert-primary my-0'>
-								<div className='row'>
-									<div className='col-12 col-md-9'>
-										<p>{i18n.t('DESCRIPTION')}</p>
-										<p className='small my-0'>
-											{i18n.t('IG_DATA')}
-											<a
-												href={i18n.t('IG_DATA_LINK')}
-												target='_blank'
-												rel='noreferrer'
-												className='ms-1'>
-												<Link45deg />
-											</a>
-										</p>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div className='row gy-3'>
-						<div className='col-12'>
-							<File
-								label={i18n.t('ZIP_FILE')}
-								accept='.zip'
-								onFileSelected={(file) => {
-									zipToUserData(file);
-								}}
-							/>
-						</div>
-					</div>
-				</>
-			) : null}
 		</header>
 	);
 };

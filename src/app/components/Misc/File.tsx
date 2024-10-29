@@ -26,7 +26,7 @@ const File = ({
 		<>
 			<label
 				htmlFor={id}
-				className='form-label'>
+				className='form-label fw-bold small'>
 				{label}
 			</label>
 			<input

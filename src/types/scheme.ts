@@ -2,6 +2,7 @@ export interface ItfData {
 	href: string;
 	timestamp: number;
 	value?: string;
+	clicked?: boolean;
 	info?: {
 		[key: string]: ItfDataInfo;
 	};

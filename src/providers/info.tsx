@@ -18,7 +18,9 @@ const InfoProvider = ({
 	const session = 'userData';
 	const [userData, setUserData] = useState({});
 	const [userDataName, setUserDataName] = useState('');
-	const [userDataTypes, setUserDataTypes] = useState([]);
+	const [userDataTypes, setUserDataTypes] = useState<string[]>([]);
+	const [userDataClicked, setUserDataClicked] = useState<string[]>([]);
+
 	const [accounts, setAccounts] = useState<ItfData[]>([]);
 	const [accountsFiltered, setAccountsFiltered] = useState<ItfData[]>([]);
 	const [totals, setTotals] = useState({
@@ -141,6 +143,22 @@ const InfoProvider = ({
 		[gatedSetUserData, gatedSetUserDataName]
 	);
 
+	const clicked = (v?: string) => {
+		if (v) {
+			setUserDataClicked((prevUserDataClicked) => {
+				prevUserDataClicked = [...prevUserDataClicked, v];
+				sessionStorage.setItem(
+					`${session}Clicked`,
+					deflate(prevUserDataClicked)
+				);
+				return prevUserDataClicked;
+			});
+		} else {
+			setUserDataClicked([]);
+			sessionStorage.setItem(`${session}Clicked`, deflate([]));
+		}
+	};
+
 	useEffect(() => {
 		let merged = [];
 		let types = {};
@@ -162,6 +180,7 @@ const InfoProvider = ({
 						merged.push({
 							...data,
 							value: data.value ?? data.href.split('/').pop(),
+							clicked: false,
 							info: types,
 						});
 						idx = merged.findIndex(
@@ -209,8 +228,6 @@ const InfoProvider = ({
 
 		if (filter) {
 			_accountsFiltered = _accountsFiltered.filter((account) => {
-				console.log(account.info.blocked_users?._);
-
 				switch (filter) {
 					case 'followers':
 						return account.info._?._ === true;
@@ -265,9 +282,18 @@ const InfoProvider = ({
 	useEffect(() => {
 		const _userData = sessionStorage.getItem(session);
 		const _userDataName = sessionStorage.getItem(`${session}Name`);
+		let _userDataClicked: string | object = sessionStorage.getItem(
+			`${session}Clicked`
+		);
 
 		if (_userData) gatedSetUserData(inflate(_userData));
 		if (_userDataName) gatedSetUserDataName(_userDataName);
+		if (_userDataClicked) {
+			_userDataClicked = inflate(_userDataClicked);
+
+			if (Array.isArray(_userDataClicked))
+				setUserDataClicked(_userDataClicked);
+		}
 	}, [gatedSetUserData, gatedSetUserDataName]);
 
 	return (
@@ -276,12 +302,14 @@ const InfoProvider = ({
 				zipToUserData,
 				userData,
 				userDataName,
+				userDataClicked,
 				accounts,
 				accountsFiltered,
 				totals,
 				page,
 				filter,
 				search,
+				clicked,
 				setUserData: gatedSetUserData,
 				setPage: gatedSetPage,
 				setFilter: gatedSetFilter,
@@ -295,6 +323,7 @@ const InfoContext = createContext({
 	zipToUserData: (file: File) => {},
 	userData: {},
 	userDataName: '',
+	userDataClicked: [],
 	accounts: [],
 	accountsFiltered: [],
 	totals: {
@@ -307,6 +336,7 @@ const InfoContext = createContext({
 	page: 0,
 	filter: '',
 	search: '',
+	clicked: (v?: string) => {},
 	setUserData: (content: object) => {},
 	setPage: (p: number) => {},
 	setFilter: (f: ItfFilterTypes) => {},

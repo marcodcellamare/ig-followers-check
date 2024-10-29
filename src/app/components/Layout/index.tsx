@@ -4,6 +4,7 @@ import Header from './Header';
 import Accounts from './Accounts';
 import Pagination from '@components/Misc/Pagination';
 import Reset from '@components/Misc/Reset';
+import Alert from './Alert';
 
 const Layout = () => {
 	const { i18n } = useTranslation();
@@ -14,8 +15,8 @@ const Layout = () => {
 			<main className='container'>
 				<Header />
 				{totals._ > 0 ? (
-					<section className='overflow-hidden'>
-						<div className='row g-1 my-3'>
+					<section>
+						<div className='row g-1 py-3'>
 							<div className='col'>
 								<Reset />
 							</div>
@@ -31,9 +32,11 @@ const Layout = () => {
 						<Accounts />
 						<hr />
 					</>
-				) : null}
-				<section className='overflow-hidden'>
-					<div className='row g-1 d-flex align-items-center mt-3 mb-5'>
+				) : (
+					<Alert />
+				)}
+				<section className='my-4'>
+					<div className='row g-1 d-flex align-items-center'>
 						<div className='col'>
 							<p className='small fw-bold my-0'>
 								{i18n.t('FOOTER')}:{' '}

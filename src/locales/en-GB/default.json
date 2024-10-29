@@ -1,8 +1,19 @@
 {
 	"TITLE": "Instagram followers check",
 	"DESCRIPTION": "Check your Instagram followers against the ones you are following, easily.",
-	"IG_DATA": "To export your Instagram data, click here:",
+	"IG_DATA": "Export your Instagram data",
 	"IG_DATA_LINK": "https://www.instagram.com/download/request/",
+	"instructions": [
+		"Download your information in Accounts Center > Click: \"Continue\"",
+		"Download your information > Click: \"Download or transfer information\"",
+		"Where do you want to get information from? > Select your account > Click: \"Next\"",
+		"How much information do you want? > Click: \"Some of your information\"",
+		"Select information > Click: \"Followers and following\" > Click: \"Next\"",
+		"What do you want to do with your information? > Click: \"Download to device\"",
+		"Create files to download > Data range: \"All time\" and Format: \"JSON\"",
+		"Click: \"Create files\" > Wait to be notified by email when they are ready to be downloaded",
+		"When ready, click: \"Download\" under the Available downloads"
+	],
 	"ACCOUNTS": "Accounts",
 	"ID": "ID",
 	"FOLLOWING": "Following",

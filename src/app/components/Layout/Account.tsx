@@ -5,6 +5,7 @@ import {
 	Clock,
 	ClockHistory,
 	ExclamationTriangle,
+	Eye,
 	Hash,
 	HourglassSplit,
 	Star,
@@ -19,7 +20,7 @@ import { ItfData } from '@interfaces/scheme';
 
 const Account = ({ k, account }: { k: number; account: ItfData }) => {
 	const { i18n } = useTranslation();
-	const { page } = useInfo();
+	const { page, clicked, userDataClicked } = useInfo();
 	const [seniority, setSeniority] = useState(0);
 
 	useEffect(() => {
@@ -72,7 +73,18 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 							: !account.info._?._
 							? ' text-danger'
 							: ''
-					}`}>
+					}${
+						userDataClicked.includes(account.value)
+							? ' px-1 border border-2 border-info'
+							: ''
+					}`}
+					onClick={(e) => {
+						clicked(account.value);
+						//e.preventDefault();
+					}}>
+					{userDataClicked.includes(account.value) ? (
+						<Eye className='me-1 text-info' />
+					) : null}
 					{seniority >= Config.data.getOld ? (
 						<ExclamationTriangle className='me-1 text-danger' />
 					) : null}
