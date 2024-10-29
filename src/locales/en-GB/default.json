@@ -14,7 +14,7 @@
 	"HASHTAG": "Hashtag",
 	"PENDING": "Pending",
 	"RECENT": "Recent",
-	"OLDER_THAN": "You have been following it for more than {{days}} days.",
+	"OLDER_THAN": "You have been following it for {{days}} days.",
 	"RECENTLY_UNFOLLOWED": "Recently unfollowed",
 	"DISMISSED_SUGGESTION": "Dismissed suggestion",
 	"ZIP_FILE": "Select the .zip file you downloaded from your Instagram account",

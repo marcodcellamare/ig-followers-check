@@ -20,7 +20,7 @@ import { ItfData } from '@interfaces/scheme';
 const Account = ({ k, account }: { k: number; account: ItfData }) => {
 	const { i18n } = useTranslation();
 	const { page } = useInfo();
-	const [older, setOlder] = useState(false);
+	const [seniority, setSeniority] = useState(0);
 
 	useEffect(() => {
 		if (
@@ -28,12 +28,19 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 			account.info.following?._ &&
 			account.info.following?.timestamp
 		) {
-			const date = new Date();
-			date.setDate(date.getDate() - Config.data.getOld);
+			const today = new Date();
 
-			setOlder(timestampToDate(account.info.following?.timestamp) < date);
+			setSeniority(
+				Math.round(
+					(today.getTime() -
+						timestampToDate(
+							account.info.following?.timestamp
+						).getTime()) /
+						(1000 * 3600 * 24)
+				)
+			);
 		}
-		return () => setOlder(false);
+		return () => setSeniority(0);
 	}, [account]);
 
 	return account ? (
@@ -66,17 +73,17 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 							? ' text-danger'
 							: ''
 					}`}>
-					{older ? (
+					{seniority >= Config.data.getOld ? (
 						<ExclamationTriangle className='me-1 text-danger' />
 					) : null}
 					{account.value}
 				</a>
-				{older ? (
+				{seniority >= Config.data.getOld ? (
 					<>
 						<br />
 						<small className='text-muted'>
 							{i18n.t('OLDER_THAN', {
-								days: Config.data.getOld,
+								days: seniority,
 							})}
 						</small>
 					</>
