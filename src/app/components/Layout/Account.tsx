@@ -17,6 +17,7 @@ import { useInfo } from '@providers/info';
 import Config from '@config';
 import { timestampToDate } from '@utils/Utils';
 import { ItfData } from '@interfaces/scheme';
+import axios from 'axios';
 
 const Account = ({ k, account }: { k: number; account: ItfData }) => {
 	const { i18n } = useTranslation();
@@ -24,6 +25,15 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 	const [seniority, setSeniority] = useState(0);
 
 	useEffect(() => {
+		axios
+			.get(account.href, { responseType: 'document' })
+			.then((r) => {
+				console.log(r);
+			})
+			.catch((err) => {
+				console.error(err.message, account.href);
+			});
+
 		if (
 			!account.info._?._ &&
 			account.info.following?._ &&
