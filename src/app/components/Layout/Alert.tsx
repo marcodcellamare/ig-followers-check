@@ -29,6 +29,7 @@ const Alert = () => {
 					return <li key={k}>{i}</li>;
 				})}
 			</ol>
+			<h5>{i18n.t('IG_DATA_SHARING')}</h5>
 			<hr />
 			<File
 				label={i18n.t('ZIP_FILE')}

@@ -1,34 +1,29 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useInfo } from '@providers/info';
 import { Star, StarFill } from 'react-bootstrap-icons';
 
-const Rating = ({
-	defaultRate = 0,
-	onChange,
-}: {
-	defaultRate: number;
-	onChange: (k: number) => void;
-}) => {
+const Rating = ({ username }: { username: string }) => {
 	const stars = [0, 1, 2, 3, 4];
+	const { getRate, setRate } = useInfo();
 	const [over, setOver] = useState(false);
 	const [tempRate, setTempRate] = useState(0);
-	const [rate, setRate] = useState(0);
 
 	const onHover = (over: boolean, k?: number) => {
 		setTempRate(over && k ? k : 0);
 		setOver(over);
 	};
-	const onClick = (k: number) => {
-		setRate((prevRate) => {
-			const newRate = prevRate !== k ? k : 0;
-			onChange(newRate);
+	const onClick = useCallback(
+		(k: number) => {
+			const rate = getRate(username);
 
-			return newRate;
-		});
-	};
+			setRate(username, rate !== k ? k : 0);
+		},
+		[getRate, setRate, username]
+	);
 
 	const color = useCallback(() => {
 		if (!over) {
-			switch (rate) {
+			switch (getRate(username)) {
 				case 1:
 					return 'danger';
 
@@ -49,31 +44,27 @@ const Rating = ({
 			}
 		}
 		return 'secondary';
-	}, [rate, over]);
-
-	useEffect(() => {
-		setRate(defaultRate);
-	}, [defaultRate]);
+	}, [getRate, username, over]);
 
 	return (
-		<div
-			className={`rating text-nowrap text-${color()}${
-				!over && !rate ? ' opacity-20' : ''
-			} small`}>
+		<div className='rating text-nowrap'>
 			{stars.map((k) => {
 				return (
-					<span
+					<button
 						key={k}
-						className='pe-1'
+						className={`btn btn-sm btn-link text-${color()}${
+							!over && !getRate(username) ? ' opacity-20' : ''
+						} p-0 d-inline lh-1`}
 						onMouseEnter={() => onHover(true, k + 1)}
 						onMouseLeave={() => onHover(false)}
 						onClick={() => onClick(k + 1)}>
-						{(over && k < tempRate) || (!over && k < rate) ? (
+						{(over && k < tempRate) ||
+						(!over && k < getRate(username)) ? (
 							<StarFill />
 						) : (
 							<Star />
 						)}
-					</span>
+					</button>
 				);
 			})}
 		</div>

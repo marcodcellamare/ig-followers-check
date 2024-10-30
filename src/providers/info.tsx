@@ -18,13 +18,13 @@ const InfoProvider = ({
 	const session = {
 		data: 'data',
 		name: 'filename',
-		checked: 'checked',
+		visited: 'visited',
 		ratings: 'ratings',
 	};
 	const [userData, setUserData] = useState({});
-	const [userDataName, setUserDataName] = useState('');
-	const [userDataTypes, setUserDataTypes] = useState<string[]>([]);
-	const [userDataClicked, setUserDataClicked] = useState<string[]>([]);
+	const [name, setName] = useState('');
+	const [types, setTypes] = useState<string[]>([]);
+	const [visited, setChecked] = useState<string[]>([]);
 	const [ratings, setRatings] = useState({});
 
 	const [accounts, setAccounts] = useState<ItfData[]>([]);
@@ -40,18 +40,25 @@ const InfoProvider = ({
 	const [filter, setFilter] = useState<ItfFilterTypes>('');
 	const [search, setSearch] = useState('');
 
+	const top = () => {
+		window.scrollTo({
+			top: 0,
+			behavior: 'smooth',
+		});
+	};
+
 	const gatedSetUserData = useCallback(
 		(d: object) => {
 			setUserData(d);
-			setUserDataTypes(Object.keys(d));
+			setTypes(Object.keys(d));
 			sessionStorage.setItem(session.data, deflate(d));
 		},
 		[session.data]
 	);
 
-	const gatedSetUserDataName = useCallback(
+	const gatedSetName = useCallback(
 		(n: string) => {
-			setUserDataName(n);
+			setName(n);
 			sessionStorage.setItem(session.name, n);
 		},
 		[session.name]
@@ -59,21 +66,24 @@ const InfoProvider = ({
 
 	const gatedSetPage = useCallback((p: number) => {
 		setPage(p);
-		window.scrollTo({
-			top: 0,
-			behavior: 'smooth',
-		});
+		top();
 	}, []);
 
-	const gatedSetFilter = useCallback((f: ItfFilterTypes) => {
-		setFilter(f);
-		setPage(0);
-	}, []);
+	const gatedSetFilter = useCallback(
+		(f: ItfFilterTypes) => {
+			setFilter(f);
+			gatedSetPage(0);
+		},
+		[gatedSetPage]
+	);
 
-	const gatedSetSearch = useCallback((q: string) => {
-		setSearch(q);
-		setPage(0);
-	}, []);
+	const gatedSetSearch = useCallback(
+		(q: string) => {
+			setSearch(q);
+			gatedSetPage(0);
+		},
+		[gatedSetPage]
+	);
 
 	const zipToUserData = useCallback(
 		(file: File) => {
@@ -136,7 +146,7 @@ const InfoProvider = ({
 									.finally(() => {
 										if (k >= total - 1) {
 											gatedSetUserData(fullJson);
-											gatedSetUserDataName(file.name);
+											gatedSetName(file.name);
 										}
 										k++;
 									});
@@ -152,24 +162,23 @@ const InfoProvider = ({
 				console.error(error);
 			}
 		},
-		[gatedSetUserData, gatedSetUserDataName]
+		[gatedSetUserData, gatedSetName]
 	);
 
-	const clicked = (v?: string) => {
-		if (v) {
-			setUserDataClicked((prevUserDataClicked) => {
-				prevUserDataClicked = [...prevUserDataClicked, v];
-				sessionStorage.setItem(
-					session.checked,
-					deflate(prevUserDataClicked)
-				);
-				return prevUserDataClicked;
+	const clicked = useCallback(
+		(v?: string) => {
+			setChecked((prevChecked) => {
+				if (v) {
+					prevChecked = [...prevChecked, v];
+				} else {
+					prevChecked = [];
+				}
+				sessionStorage.setItem(session.visited, deflate(prevChecked));
+				return prevChecked;
 			});
-		} else {
-			setUserDataClicked([]);
-			sessionStorage.setItem(session.checked, deflate([]));
-		}
-	};
+		},
+		[session.visited]
+	);
 
 	const setRate = (v: string, r: number) => {
 		setRatings((prevRatings) => {
@@ -179,7 +188,6 @@ const InfoProvider = ({
 				delete prevRatings[v];
 			}
 			sessionStorage.setItem(session.ratings, deflate(prevRatings));
-
 			return prevRatings;
 		});
 	};
@@ -193,11 +201,11 @@ const InfoProvider = ({
 
 	useEffect(() => {
 		let merged = [];
-		let types = {};
+		let _types = {};
 
-		userDataTypes.forEach((t) => {
-			types = {
-				...types,
+		types.forEach((t) => {
+			_types = {
+				..._types,
 				[t]: { _: false, timestamp: 0 },
 			};
 		});
@@ -213,7 +221,7 @@ const InfoProvider = ({
 							...data,
 							value: data.value ?? data.href.split('/').pop(),
 							clicked: false,
-							info: types,
+							info: _types,
 						});
 						idx = merged.findIndex(
 							(m: ItfData) => m.href === data.href
@@ -231,11 +239,11 @@ const InfoProvider = ({
 		});
 		merged.sort(
 			(a: ItfData, b: ItfData) =>
-				a.info.following?.timestamp - b.info.following?.timestamp ||
+				b.info.following?.timestamp - a.info.following?.timestamp ||
 				a.value.localeCompare(b.value)
 		);
 		setAccounts(merged);
-	}, [userData, userDataTypes]);
+	}, [userData, types]);
 
 	useEffect(() => {
 		const totalFollowers = accounts.filter(
@@ -313,27 +321,24 @@ const InfoProvider = ({
 
 	useEffect(() => {
 		const _userData = sessionStorage.getItem(session.data);
-		const _userDataName = sessionStorage.getItem(session.name);
-		let _userDataClicked: string | object = sessionStorage.getItem(
-			session.checked
-		);
+		const _name = sessionStorage.getItem(session.name);
+		let _visited: string | object = sessionStorage.getItem(session.visited);
 		const _ratings = sessionStorage.getItem(session.ratings);
 
 		if (_userData) gatedSetUserData(inflate(_userData));
-		if (_userDataName) gatedSetUserDataName(_userDataName);
-		if (_userDataClicked) {
-			_userDataClicked = inflate(_userDataClicked);
+		if (_name) gatedSetName(_name);
+		if (_visited) {
+			_visited = inflate(_visited);
 
-			if (Array.isArray(_userDataClicked))
-				setUserDataClicked(_userDataClicked);
+			if (Array.isArray(_visited)) setChecked(_visited);
 		}
 		if (_ratings) setRatings(inflate(_ratings));
 	}, [
 		gatedSetUserData,
-		gatedSetUserDataName,
+		gatedSetName,
 		session.data,
 		session.name,
-		session.checked,
+		session.visited,
 		session.ratings,
 	]);
 
@@ -342,8 +347,8 @@ const InfoProvider = ({
 			value={{
 				zipToUserData,
 				userData,
-				userDataName,
-				userDataClicked,
+				name,
+				visited,
 				accounts,
 				accountsFiltered,
 				totals,
@@ -365,8 +370,8 @@ const InfoProvider = ({
 const InfoContext = createContext({
 	zipToUserData: (file: File) => {},
 	userData: {},
-	userDataName: '',
-	userDataClicked: [],
+	name: '',
+	visited: [],
 	accounts: [],
 	accountsFiltered: [],
 	totals: {
