@@ -15,11 +15,17 @@ const InfoProvider = ({
 }: {
 	children: React.ReactNode | React.ReactNode[];
 }) => {
-	const session = 'userData';
+	const session = {
+		data: 'data',
+		name: 'filename',
+		checked: 'checked',
+		ratings: 'ratings',
+	};
 	const [userData, setUserData] = useState({});
 	const [userDataName, setUserDataName] = useState('');
 	const [userDataTypes, setUserDataTypes] = useState<string[]>([]);
 	const [userDataClicked, setUserDataClicked] = useState<string[]>([]);
+	const [ratings, setRatings] = useState({});
 
 	const [accounts, setAccounts] = useState<ItfData[]>([]);
 	const [accountsFiltered, setAccountsFiltered] = useState<ItfData[]>([]);
@@ -34,16 +40,22 @@ const InfoProvider = ({
 	const [filter, setFilter] = useState<ItfFilterTypes>('');
 	const [search, setSearch] = useState('');
 
-	const gatedSetUserData = useCallback((d: object) => {
-		setUserData(d);
-		setUserDataTypes(Object.keys(d));
-		sessionStorage.setItem(session, deflate(d));
-	}, []);
+	const gatedSetUserData = useCallback(
+		(d: object) => {
+			setUserData(d);
+			setUserDataTypes(Object.keys(d));
+			sessionStorage.setItem(session.data, deflate(d));
+		},
+		[session.data]
+	);
 
-	const gatedSetUserDataName = useCallback((n: string) => {
-		setUserDataName(n);
-		sessionStorage.setItem(`${session}Name`, n);
-	}, []);
+	const gatedSetUserDataName = useCallback(
+		(n: string) => {
+			setUserDataName(n);
+			sessionStorage.setItem(session.name, n);
+		},
+		[session.name]
+	);
 
 	const gatedSetPage = useCallback((p: number) => {
 		setPage(p);
@@ -116,8 +128,8 @@ const InfoProvider = ({
 											];
 										}
 									})
-									.catch((err) => {
-										throw Object.assign(new Error(err), {
+									.catch((error) => {
+										throw Object.assign(new Error(error), {
 											code: 406,
 										});
 									})
@@ -131,13 +143,13 @@ const InfoProvider = ({
 							}
 						});
 					})
-					.catch((err) => {
-						throw Object.assign(new Error(err), {
+					.catch((error) => {
+						throw Object.assign(new Error(error), {
 							code: 406,
 						});
 					});
-			} catch (err) {
-				console.error(err);
+			} catch (error) {
+				console.error(error);
 			}
 		},
 		[gatedSetUserData, gatedSetUserDataName]
@@ -148,16 +160,36 @@ const InfoProvider = ({
 			setUserDataClicked((prevUserDataClicked) => {
 				prevUserDataClicked = [...prevUserDataClicked, v];
 				sessionStorage.setItem(
-					`${session}Clicked`,
+					session.checked,
 					deflate(prevUserDataClicked)
 				);
 				return prevUserDataClicked;
 			});
 		} else {
 			setUserDataClicked([]);
-			sessionStorage.setItem(`${session}Clicked`, deflate([]));
+			sessionStorage.setItem(session.checked, deflate([]));
 		}
 	};
+
+	const setRate = (v: string, r: number) => {
+		setRatings((prevRatings) => {
+			if (r) {
+				prevRatings = { ...prevRatings, [v]: r };
+			} else {
+				delete prevRatings[v];
+			}
+			sessionStorage.setItem(session.ratings, deflate(prevRatings));
+
+			return prevRatings;
+		});
+	};
+
+	const getRate = useCallback(
+		(v: string): number => {
+			return ratings.hasOwnProperty(v) ? parseInt(ratings[v]) : 0;
+		},
+		[ratings]
+	);
 
 	useEffect(() => {
 		let merged = [];
@@ -280,11 +312,12 @@ const InfoProvider = ({
 	}, [accounts, page, filter, search]);
 
 	useEffect(() => {
-		const _userData = sessionStorage.getItem(session);
-		const _userDataName = sessionStorage.getItem(`${session}Name`);
+		const _userData = sessionStorage.getItem(session.data);
+		const _userDataName = sessionStorage.getItem(session.name);
 		let _userDataClicked: string | object = sessionStorage.getItem(
-			`${session}Clicked`
+			session.checked
 		);
+		const _ratings = sessionStorage.getItem(session.ratings);
 
 		if (_userData) gatedSetUserData(inflate(_userData));
 		if (_userDataName) gatedSetUserDataName(_userDataName);
@@ -294,7 +327,15 @@ const InfoProvider = ({
 			if (Array.isArray(_userDataClicked))
 				setUserDataClicked(_userDataClicked);
 		}
-	}, [gatedSetUserData, gatedSetUserDataName]);
+		if (_ratings) setRatings(inflate(_ratings));
+	}, [
+		gatedSetUserData,
+		gatedSetUserDataName,
+		session.data,
+		session.name,
+		session.checked,
+		session.ratings,
+	]);
 
 	return (
 		<InfoContext.Provider
@@ -310,6 +351,8 @@ const InfoProvider = ({
 				filter,
 				search,
 				clicked,
+				setRate,
+				getRate,
 				setUserData: gatedSetUserData,
 				setPage: gatedSetPage,
 				setFilter: gatedSetFilter,
@@ -337,6 +380,8 @@ const InfoContext = createContext({
 	filter: '',
 	search: '',
 	clicked: (v?: string) => {},
+	setRate: (v: string, r: number) => {},
+	getRate: (v: string): number => 0,
 	setUserData: (content: object) => {},
 	setPage: (p: number) => {},
 	setFilter: (f: ItfFilterTypes) => {},

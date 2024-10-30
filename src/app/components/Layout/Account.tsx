@@ -17,37 +17,14 @@ import { useInfo } from '@providers/info';
 import Config from '@config';
 import { timestampToDate } from '@utils/Utils';
 import { ItfData } from '@interfaces/scheme';
-import axios from 'axios';
+import Rating from '@components/Misc/Rating';
 
 const Account = ({ k, account }: { k: number; account: ItfData }) => {
 	const { i18n } = useTranslation();
-	const { page, clicked, userDataClicked } = useInfo();
+	const { page, clicked, userDataClicked, setRate, getRate } = useInfo();
 	const [seniority, setSeniority] = useState(0);
 
 	useEffect(() => {
-		/*
-		axios
-			.get(account.href, { responseType: 'document', redirec })
-			.then((r) => {
-				console.log(r);
-			})
-			.catch((err) => {
-				console.error(err.message, account.href);
-			});
-			*/
-
-		const myHeaders = new Headers();
-		myHeaders.append('Cookie', 'csrftoken=pQnSOW3XWdrFhirVd0iRGm');
-
-		fetch(account.href, {
-			method: 'GET',
-			headers: myHeaders,
-			redirect: 'follow',
-		})
-			.then((response) => response.text())
-			.then((result) => console.log(result))
-			.catch((error) => console.error(error));
-
 		if (
 			!account.info._?._ &&
 			account.info.following?._ &&
@@ -85,6 +62,14 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 				className='text-end pe-2 small'>
 				{k + 1 + Config.itemsPerPage * page}
 			</th>
+			<td className='text-nowrap'>
+				<Rating
+					defaultRate={getRate(account.value)}
+					onChange={(r) => {
+						setRate(account.value, r);
+					}}
+				/>
+			</td>
 			<td>
 				<a
 					href={account.href}

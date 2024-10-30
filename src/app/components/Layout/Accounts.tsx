@@ -23,6 +23,11 @@ const Accounts = () => {
 									style={{ width: '1px' }}>
 									#
 								</th>
+								<th
+									scope='col'
+									style={{ width: '1px' }}>
+									{i18n.t('RATING')}
+								</th>
 								<th scope='col'>{i18n.t('ID')}</th>
 								<th
 									scope='col'
