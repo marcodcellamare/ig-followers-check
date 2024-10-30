@@ -87,10 +87,7 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 							? ' px-1 border border-2 border-info'
 							: ''
 					}`}
-					onClick={(e) => {
-						clicked(account.value);
-						//e.preventDefault();
-					}}>
+					onMouseDown={() => clicked(account.value)}>
 					{userDataClicked.includes(account.value) ? (
 						<Eye className='me-1 text-info' />
 					) : null}
