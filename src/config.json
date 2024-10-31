@@ -52,8 +52,11 @@
 	},
 	"data": {
 		"typeCleanup": "relationships_",
-		"zipPath": "connections/followers_and_following/",
-		"getOld": 14
+		"zipPath": "followers_and_following/",
+		"getOld": 14,
+		"extensions": {
+			"ratings": "ifxr"
+		}
 	},
 	"itemsPerPage": 50,
 	"pagination": 7

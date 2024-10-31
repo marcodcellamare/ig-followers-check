@@ -85,6 +85,32 @@ const InfoProvider = ({
 		[gatedSetPage]
 	);
 
+	const setRatingFromFile = useCallback(
+		(c: string) => {
+			if (c.startsWith(Config.data.extensions.ratings + '|')) {
+				try {
+					const _ratings = inflate(
+						c.slice((Config.data.extensions.ratings + '|').length)
+					);
+					setRatings(_ratings);
+					sessionStorage.setItem(session.ratings, deflate(_ratings));
+				} catch (error) {
+					console.error(error);
+				}
+			}
+		},
+		[session.ratings]
+	);
+
+	const getRatingToFile = useCallback((): string => {
+		try {
+			return Config.data.extensions.ratings + '|' + deflate(ratings);
+		} catch (error) {
+			console.error(error);
+		}
+		return '';
+	}, [ratings]);
+
 	const zipToUserData = useCallback(
 		(file: File) => {
 			try {
@@ -325,14 +351,39 @@ const InfoProvider = ({
 		let _visited: string | object = sessionStorage.getItem(session.visited);
 		const _ratings = sessionStorage.getItem(session.ratings);
 
-		if (_userData) gatedSetUserData(inflate(_userData));
+		if (_userData) {
+			try {
+				gatedSetUserData(inflate(_userData));
+			} catch (error) {
+				console.error(error);
+			}
+		}
 		if (_name) gatedSetName(_name);
 		if (_visited) {
-			_visited = inflate(_visited);
+			try {
+				_visited = inflate(_visited);
 
-			if (Array.isArray(_visited)) setChecked(_visited);
+				if (Array.isArray(_visited)) {
+					setChecked(_visited);
+				} else {
+					throw Object.assign(
+						new Error('"visited" is not an Array'),
+						{
+							code: 406,
+						}
+					);
+				}
+			} catch (error) {
+				console.error(error);
+			}
 		}
-		if (_ratings) setRatings(inflate(_ratings));
+		if (_ratings) {
+			try {
+				setRatings(inflate(_ratings));
+			} catch (error) {
+				console.error(error);
+			}
+		}
 	}, [
 		gatedSetUserData,
 		gatedSetName,
@@ -362,6 +413,8 @@ const InfoProvider = ({
 				setPage: gatedSetPage,
 				setFilter: gatedSetFilter,
 				setSearch: gatedSetSearch,
+				setRatingFromFile,
+				getRatingToFile,
 			}}>
 			{children}
 		</InfoContext.Provider>
@@ -391,6 +444,8 @@ const InfoContext = createContext({
 	setPage: (p: number) => {},
 	setFilter: (f: ItfFilterTypes) => {},
 	setSearch: (f: string) => {},
+	setRatingFromFile: (c: string) => {},
+	getRatingToFile: (): string => '',
 });
 
 const useInfo = () => {

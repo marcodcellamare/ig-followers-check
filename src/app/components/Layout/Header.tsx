@@ -31,6 +31,7 @@ const Header = () => {
 				return 'secondary';
 		}
 	};
+
 	return (
 		<header className='my-4'>
 			<div className='row d-flex align-items-center'>

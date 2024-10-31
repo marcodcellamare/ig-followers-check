@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useInfo } from '@providers/info';
 import Rating from '@components/Misc/Rating';
 import Config from '@config';
-import { timestampToDate } from '@utils/Utils';
+import { timestampToDate } from '@utils/index';
 import { ItfData } from '@interfaces/scheme';
 
 const Account = ({ k, account }: { k: number; account: ItfData }) => {
@@ -174,11 +174,12 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 				{seniority.v ? (
 					<>
 						<br />
-						<small
+						<span
 							className={
-								seniority.d >= Config.data.getOld
+								'd-inline-block small lh-sm mt-1 ' +
+								(seniority.d >= Config.data.getOld
 									? 'text-danger'
-									: 'text-muted'
+									: 'text-muted')
 							}>
 							{seniority.d >= Config.data.getOld ? (
 								<ExclamationTriangle className='me-1' />
@@ -201,7 +202,7 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 									.t('SECONDS', { count: seniority.s })
 									.toLowerCase(),
 							})}
-						</small>
+						</span>
 					</>
 				) : null}
 			</td>
