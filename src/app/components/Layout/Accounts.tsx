@@ -1,5 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import { ArrowDown, ArrowUp, Floppy, Folder } from 'react-bootstrap-icons';
+import { Floppy, Folder } from 'react-bootstrap-icons';
 import { useTranslation } from 'react-i18next';
 import { useInfo } from '@providers/info';
 import { saveFile, readFile } from '@utils/index';
@@ -11,8 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const Accounts = () => {
 	const { i18n } = useTranslation();
-	const { accountsFiltered, getRatingToFile, setRatingFromFile, name } =
-		useInfo();
+	const { accountsFiltered, getRatingToFile, setRatingFromFile } = useInfo();
 	const [clickTrigger, setClickTrigger] = useState('');
 
 	const downloadRatings = () => {
