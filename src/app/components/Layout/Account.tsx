@@ -22,9 +22,18 @@ import Config from '@config';
 import { timestampToDate } from '@utils/index';
 import { ItfData } from '@interfaces/scheme';
 
-const Account = ({ k, account }: { k: number; account: ItfData }) => {
+const Account = ({
+	k,
+	account,
+	checkAll,
+}: {
+	k: number;
+	account: ItfData;
+	checkAll: boolean;
+}) => {
 	const { i18n } = useTranslation();
-	const { page, clicked, visited, getRate } = useInfo();
+	const { page, openLink, visited, getRate, setSelected } = useInfo();
+	const [checked, setChecked] = useState(false);
 	const [seniority, setSeniority] = useState({
 		v: false,
 		d: 0,
@@ -78,6 +87,16 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 		account.info.follow_requests_sent?._,
 	]);
 
+	const onChange = useCallback(
+		(c: boolean) => {
+			if (!ignore()) {
+				setChecked(c);
+				setSelected(account.value, c);
+			}
+		},
+		[ignore, setSelected, account.value]
+	);
+
 	const icons = useCallback(() => {
 		if (ignore()) {
 			return <Ban className='text-danger' />;
@@ -127,9 +146,13 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 		account.info.following?.timestamp,
 	]);
 
+	useEffect(() => {
+		onChange(checkAll);
+	}, [checkAll, onChange]);
+
 	return account ? (
 		<tr
-			className={
+			className={`${
 				ignore()
 					? 'table-secondary'
 					: getRate(account.value) === 1
@@ -139,7 +162,20 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 					: !account.info._?._
 					? 'table-warning'
 					: ''
-			}>
+			}${!ignore() && checked ? ' border-2 border-primary' : ''}`}>
+			<td>
+				{!ignore() ? (
+					<div className='form-check form-switch'>
+						<input
+							className='form-check-input'
+							type='checkbox'
+							role='switch'
+							checked={checked}
+							onChange={(e) => onChange(e.target.checked)}
+						/>
+					</div>
+				) : null}
+			</td>
 			<th
 				scope='row'
 				className='text-end pe-2 small'>
@@ -150,11 +186,8 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 			</td>
 			<td>
 				<span className='me-1'>{icons()}</span>
-				<a
-					href={account.href}
-					target='_blank'
-					rel='noreferrer'
-					className={`fw-bold${
+				<button
+					className={`btn btn-link p-0 fw-bold${
 						ignore()
 							? ' text-secondary'
 							: !account.info._?._
@@ -165,12 +198,12 @@ const Account = ({ k, account }: { k: number; account: ItfData }) => {
 							? ' px-1 border border-2 border-info'
 							: ''
 					}`}
-					onMouseDown={() => clicked(account.value)}>
+					onMouseUp={() => openLink(account.value, account.href)}>
 					{visited.includes(account.value) ? (
 						<Eye className='me-1 text-info' />
 					) : null}
 					{account.value}
-				</a>
+				</button>
 				{seniority.v ? (
 					<>
 						<br />

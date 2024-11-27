@@ -1,18 +1,43 @@
+import { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Floppy, Folder } from 'react-bootstrap-icons';
+import { Floppy, Folder, FolderSymlink } from 'react-bootstrap-icons';
 import { useTranslation } from 'react-i18next';
 import { useInfo } from '@providers/info';
 import { saveFile, readFile } from '@utils/index';
 import Config from '@config';
 import File from '@components/Misc/File';
 import Account from './Account';
-import { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 const Accounts = () => {
 	const { i18n } = useTranslation();
-	const { accountsFiltered, getRatingToFile, setRatingFromFile } = useInfo();
+	const {
+		accountsFiltered,
+		getRatingToFile,
+		setRatingFromFile,
+		selected,
+		setSelected,
+		page,
+		openLink,
+	} = useInfo();
+	const [checkAll, setCheckAll] = useState(false);
 	const [clickTrigger, setClickTrigger] = useState('');
+
+	const openAll = useCallback(() => {
+		if (selected.length > 0) {
+			const toOpen = accountsFiltered.filter((a) =>
+				selected.includes(a.value)
+			);
+
+			if (toOpen.length > 0) {
+				toOpen.forEach((a) => openLink(a.value, a.href));
+			}
+		}
+	}, [selected, accountsFiltered, openLink]);
+
+	const onCheckAll = (c: boolean) => {
+		setCheckAll(c);
+	};
 
 	const downloadRatings = () => {
 		saveFile({
@@ -30,6 +55,11 @@ const Accounts = () => {
 		setClickTrigger(uuidv4());
 	};
 
+	useEffect(() => {
+		setCheckAll(false);
+		setSelected();
+	}, [page, setSelected]);
+
 	return (
 		<section className='my-4'>
 			<Helmet>
@@ -38,25 +68,42 @@ const Accounts = () => {
 			{accountsFiltered.length > 0 ? (
 				<div className='table-responsive'>
 					<table className='table table-sm table-hover'>
-						<thead>
+						<thead className='table-secondary'>
 							<tr>
 								<th
 									scope='col'
-									className='text-end pe-2'
+									className='py-3'
+									style={{ width: '1px' }}>
+									<div className='form-check form-switch'>
+										<input
+											className='form-check-input'
+											type='checkbox'
+											role='switch'
+											checked={checkAll}
+											onChange={(e) =>
+												onCheckAll(e.target.checked)
+											}
+										/>
+									</div>
+								</th>
+								<th
+									scope='col'
+									className='text-end py-3 pe-2'
 									style={{ width: '1px' }}>
 									#
 								</th>
 								<th
 									scope='col'
 									style={{ width: '1px' }}
-									className='text-nowrap'>
+									className='text-nowrap py-3 pe-3'>
 									<File
 										hidden={true}
 										accept={`.${Config.data.extensions.ratings}`}
 										clickTrigger={clickTrigger}
 										onFileSelected={uploadRatings}
 									/>
-									<span className='btn-group align-bottom me-1'>
+									{i18n.t('RATING')}
+									<span className='btn-group align-bottom ms-2'>
 										<button
 											className='btn btn-sm btn-outline-success p-1 lh-1'
 											onClick={uploadRatingsTrigger}>
@@ -68,20 +115,33 @@ const Accounts = () => {
 											<Floppy />
 										</button>
 									</span>
-									{i18n.t('RATING')}
 								</th>
-								<th scope='col'>{i18n.t('ID')}</th>
 								<th
 									scope='col'
+									className='text-nowrap py-3'>
+									{i18n.t('ID')}
+									<button
+										className='btn btn-sm btn-outline-success p-1 lh-1 align-bottom ms-2'
+										disabled={selected.length === 0}
+										onClick={openAll}>
+										<strong>{selected.length}</strong>{' '}
+										<FolderSymlink />
+									</button>
+								</th>
+								<th
+									scope='col'
+									className='py-3'
 									style={{ width: '1px' }}
 								/>
 								<th
 									scope='col'
+									className='py-3'
 									style={{ width: '1px' }}>
 									{i18n.t('FOLLOWERS')}
 								</th>
 								<th
 									scope='col'
+									className='py-3'
 									style={{ width: '1px' }}>
 									{i18n.t('FOLLOWING')}
 								</th>
@@ -94,6 +154,7 @@ const Accounts = () => {
 										key={k}
 										k={k}
 										account={account}
+										checkAll={checkAll}
 									/>
 								);
 							})}

@@ -2,7 +2,7 @@ import { useInfo } from '@providers/info';
 import { XLg } from 'react-bootstrap-icons';
 
 const Reset = () => {
-	const { setUserData, setPage, setFilter, setSearch, name, clicked } =
+	const { setUserData, setPage, setFilter, setSearch, name, openLink } =
 		useInfo();
 
 	return (
@@ -15,7 +15,7 @@ const Reset = () => {
 				setPage(0);
 				setFilter('');
 				setSearch('');
-				clicked();
+				openLink();
 			}}>
 			<XLg className='me-1' />
 			<small>{name}</small>

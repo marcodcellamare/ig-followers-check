@@ -24,7 +24,8 @@ const InfoProvider = ({
 	const [userData, setUserData] = useState({});
 	const [name, setName] = useState('');
 	const [types, setTypes] = useState<string[]>([]);
-	const [visited, setChecked] = useState<string[]>([]);
+	const [selected, setSelected] = useState<string[]>([]);
+	const [visited, setVisited] = useState<string[]>([]);
 	const [ratings, setRatings] = useState({});
 
 	const [accounts, setAccounts] = useState<ItfData[]>([]);
@@ -191,17 +192,34 @@ const InfoProvider = ({
 		[gatedSetUserData, gatedSetName]
 	);
 
-	const clicked = useCallback(
-		(v?: string) => {
-			setChecked((prevChecked) => {
-				if (v) {
-					prevChecked = [...prevChecked, v];
-				} else {
-					prevChecked = [];
+	const gatedSetSelected = useCallback((v?: string, c?: boolean) => {
+		if (v) {
+			setSelected((prevSelected) => {
+				if (c)
+					return !prevSelected.includes(v)
+						? [...prevSelected, v]
+						: prevSelected;
+				else {
+					return prevSelected.filter((s) => s !== v);
 				}
-				sessionStorage.setItem(session.visited, deflate(prevChecked));
-				return prevChecked;
 			});
+		} else {
+			setSelected([]);
+		}
+	}, []);
+
+	const openLink = useCallback(
+		(v?: string, href?: string) => {
+			setVisited((prevVisited) => {
+				if (v) {
+					prevVisited = [...prevVisited, v];
+				} else {
+					prevVisited = [];
+				}
+				sessionStorage.setItem(session.visited, deflate(prevVisited));
+				return prevVisited;
+			});
+			if (v && href) window.open(href, '_blank', 'noreferrer');
 		},
 		[session.visited]
 	);
@@ -364,7 +382,7 @@ const InfoProvider = ({
 				_visited = inflate(_visited);
 
 				if (Array.isArray(_visited)) {
-					setChecked(_visited);
+					setVisited(_visited);
 				} else {
 					throw Object.assign(
 						new Error('"visited" is not an Array'),
@@ -399,6 +417,7 @@ const InfoProvider = ({
 				zipToUserData,
 				userData,
 				name,
+				selected,
 				visited,
 				accounts,
 				accountsFiltered,
@@ -406,13 +425,14 @@ const InfoProvider = ({
 				page,
 				filter,
 				search,
-				clicked,
+				openLink,
 				setRate,
 				getRate,
 				setUserData: gatedSetUserData,
 				setPage: gatedSetPage,
 				setFilter: gatedSetFilter,
 				setSearch: gatedSetSearch,
+				setSelected: gatedSetSelected,
 				setRatingFromFile,
 				getRatingToFile,
 			}}>
@@ -424,6 +444,7 @@ const InfoContext = createContext({
 	zipToUserData: (file: File) => {},
 	userData: {},
 	name: '',
+	selected: [],
 	visited: [],
 	accounts: [],
 	accountsFiltered: [],
@@ -437,13 +458,14 @@ const InfoContext = createContext({
 	page: 0,
 	filter: '',
 	search: '',
-	clicked: (v?: string) => {},
+	openLink: (v?: string, href?: string) => {},
 	setRate: (v: string, r: number) => {},
 	getRate: (v: string): number => 0,
 	setUserData: (content: object) => {},
 	setPage: (p: number) => {},
 	setFilter: (f: ItfFilterTypes) => {},
 	setSearch: (f: string) => {},
+	setSelected: (v?: string, c?: boolean) => {},
 	setRatingFromFile: (c: string) => {},
 	getRatingToFile: (): string => '',
 });
